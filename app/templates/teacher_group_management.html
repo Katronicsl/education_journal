@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление группой - {{ subject.name }} | {{ group.name }}</title>
+    <style>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 95%; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #002FA7, #0056b3); color: white; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header-info h1 { font-size: 28px; margin-bottom: 8px; }
+        .header-info .subtitle { font-size: 16px; opacity: 0.9; }
+        .user-section { display: flex; align-items: center; gap: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-back {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: #E7F1FF;
+            color: #000000;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 47, 167, 0.3);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .btn-back:hover {
+            background: #b4cae8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 47, 167, 0.4);
+        }
+
+        .tabs { display: flex; background: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+        .tab { padding: 15px 30px; cursor: pointer; border: none; background: none; font-size: 15px; color: #6c757d; border-bottom: 3px solid transparent; }
+        .tab.active { color: #002FA7; border-bottom-color: #002FA7; background: white; }
+        .content { padding: 30px 40px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 12px; }
+        .stats { display: flex; gap: 30px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #002FA7; }
+        .stat-label { font-size: 12px; color: #6c757d; }
+        .btn-add { background: #28a745; color: white; padding: 12px 25px; }
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); overflow-x: auto; }
+        .excel-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .excel-table th { background: #f8f9fa; border: 1px solid #dee2e6; padding: 12px 8px; text-align: center; font-weight: 600; }
+        .excel-table td { border: 1px solid #dee2e6; padding: 12px 8px; text-align: center; }
+        .student-name { text-align: left; font-weight: 600; min-width: 220px; position: sticky; left: 0; background: white; z-index:10; }
+        .grade-cell, .attendance-cell { cursor: pointer; transition: all 0.2s ease; min-width: 80px; }
+        .grade-cell:hover, .attendance-cell:hover { background: #e3f2fd !important; }
+        
+
+        .grade-cell.fail { background: #f8d7da; color: #721c24; font-weight: bold; }
+        .grade-cell.pass { background: #d4edda; color: #155724; font-weight: bold; }
+        .grade-cell.empty { background: #f8f9fa; color: #6c757d; }
+
+      
+        .average-cell.fail { background: #f8d7da; color: #721c24; font-weight: bold; }
+        .average-cell.pass { background: #d4edda; color: #155724; font-weight: bold; }
+        .average-cell { background: #e8f5e8; font-weight: bold; min-width: 100px; }
+
+
+        .attendance-cell.present { background: #d4edda; color: #155724; font-weight: bold; } /* + (Зеленый) */
+        .attendance-cell.excused { background: #fff3cd; color: #856404; font-weight: bold; } /* УП (Желтый) */
+        .attendance-cell.absent { background: #f8d7da; color: #721c24; font-weight: bold; }  /* НП (Красный) */
+        .attendance-cell.empty { background: #f8f9fa; color: #6c757d; }
+        .header-cell { background: #e3f2fd; cursor: pointer; position: relative; min-width: 120px; }
+        .date-header { font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #002FA7; }
+        .topic-header { font-size: 11px; color: #666; font-style: italic; }
+        .delete-column-btn { background: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; position: absolute; top: 2px; right: 2px; }
+        .system-info { background: #e7f1ff; padding: 12px 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #002FA7; }
+
+
+        .importance-star {
+            font-size: 16px;
+            color: #ccc;
+            cursor: pointer;
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            transition: color 0.2s;
+            user-select: none;
+        }
+        .importance-star.active {
+            color: #ffc107; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .importance-star:hover {
+            transform: scale(1.2);
+        }
+        /* Кнопка удаления (крестик) */
+        .delete-column-btn { 
+            background: #dc3545; 
+            color: white; 
+            border: none; 
+            padding: 2px 6px; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            font-size: 10px; 
+            position: absolute; 
+            top: 2px; 
+            right: 2px; 
+            
+
+            opacity: 0;           
+            visibility: hidden;   
+            transition: all 0.2s ease; 
+        }
+
+
+        .header-cell:hover .delete-column-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+<div class="header">
+        <div class="header-info">
+
+            <h1>{{ subject.name }}</h1>
+            
+
+            <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px;">
+                
+
+                <div class="subtitle" style="margin: 0; opacity: 0.9; font-size: 16px;">
+                    Группа: {{ group.name }} | Студентов: {{ students_data|length }}
+                </div>
+
+
+                <a href="{{ url_for('teacher.export_group_excel', assignment_id=assignment_id) }}" 
+                   style="
+                       background: #28a745; 
+                       color: white; 
+                       padding: 5px 12px; 
+                       border-radius: 10px; 
+                       text-decoration: none; 
+                       font-size: 13px; 
+                       font-weight: bold; 
+                       display: inline-flex; 
+                       align-items: center; 
+                       gap: 5px;
+                       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                       transition: transform 0.2s;
+                   "
+                   onmouseover="this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                    Скачать отчёт в Excel
+                </a>
+            </div>
+        </div>
+
+
+        <div class="user-section">
+            <span class="user-name">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</span>
+            <a href="/teacher/subject/{{ subject.id }}" class="btn btn-back">←</a>
+        </div>
+    </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('grades')">📊 Успеваемость</button>
+            <button class="tab" onclick="switchTab('attendance')">✅ Посещаемость</button>
+        </div>
+
+        <div class="content">
+
+            <div id="grades-tab" class="tab-content active">
+                <div class="controls">
+                    <div class="system-info" id="grading-system-info">
+                        <strong>Система:</strong> 
+                        <span id="current-system-name">Загрузка...</span>
+                        <br>
+                        <strong>Метод расчета:</strong>
+                        <span id="calculation-method-display">Средний балл</span>
+                        <a href="/teacher/grading_system/{{ assignment_id }}" style="margin-left: 15px; color: #002FA7; text-decoration: none;">
+                            ⚙️ Настроить
+                        </a>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-grade">0.0</div>
+                            <div class="stat-label" id="avg-label">Средний балл</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-grades">0</div>
+                            <div class="stat-label">Всего оценок</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-add" onclick="addGradeColumn()">+ Добавить занятие</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="excel-table" id="grades-table">
+                        <thead id="grades-header">
+                            <tr>
+                                <th class="student-name">Студент</th>
+          
+                                <th class="average-header" id="final-header">Итог</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grades-body">
+                     
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div id="attendance-tab" class="tab-content">
+                <div class="controls">
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-attendance">0%</div>
+                            <div class="stat-label">Средняя посещаемость</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-lessons">0</div>
+                            <div class="stat-label">Всего занятий</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-add" onclick="addAttendanceColumn()">+ Добавить занятие</button>
+
+                </div>
+
+                <div class="table-container">
+                    <table class="excel-table" id="attendance-table">
+                        <thead id="attendance-header">
+                            <tr>
+                                <th class="student-name">Студент</th>
+
+                                <th class="attendance-header">Посещаемость</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+    let studentsData = [];
+    let assignmentId = "{{ assignment_id }}"; 
+    let groupId = "{{ group.id }}";
+    let currentColumnId = 1; 
+    
+
+    let gradingSystem = { type: 'points', maxPoints: 100, minPoints: -1000, passingGrade: 60 }; // Ставим minPoints -1000 по умолчанию
+    let calculationMethod = 'average'; 
+    let currentEditingCell = null;
+    let lessonsMap = {}; 
+
+    async function loadStudents() {
+        try {
+            const response = await fetch(`/teacher/get_group_students/${groupId}`);
+            const data = await response.json();
+            studentsData = data.students.map(student => ({
+                student: { id: student.id, last_name: student.last_name, first_name: student.first_name }
+            }));
+        } catch (error) { console.error(error); }
+    }
+
+    async function loadGradingSystem() {
+        try {
+            const response = await fetch(`/teacher/get_grading_system?assignment_id=${assignmentId}`);
+            if (response.ok) {
+                const data = await response.json();
+                gradingSystem = data;
+                
+
+                if (gradingSystem.minPoints === 0) {
+                    gradingSystem.minPoints = -500;
+                }
+                
+                calculationMethod = gradingSystem.calculationMethod || 'average';
+                updateSystemDisplay();
+            }
+        } catch (error) { console.error(error); }
+    }
+
+    function updateSystemDisplay() {
+        let systemText = '';
+        const passing = gradingSystem.passingGrade || 60;
+        
+        switch(gradingSystem.type) {
+            case 'points': systemText = `🎯 Балльная`; break;
+            case 'percentage': systemText = `📊 Процентная`; break;
+            case 'letter': systemText = `🔤 Буквенная`; break;
+            case 'custom': systemText = '🎨 Кастомная'; break;
+        }
+        
+        const el = document.getElementById('current-system-name');
+        if(el) el.textContent = systemText;
+
+        const methodEl = document.getElementById('calculation-method-display');
+        const avgLabel = document.getElementById('avg-label');
+        const finalHeader = document.getElementById('final-header');
+        
+        if (gradingSystem.type === 'custom') {
+            if(methodEl) methodEl.textContent = '📝 Текст + Цифры';
+            if(avgLabel) avgLabel.textContent = 'Сдало студентов';
+            if(finalHeader) finalHeader.textContent = 'Статус';
+        } else if (calculationMethod === 'sum') {
+            if(methodEl) methodEl.textContent = '✖️ Сумма баллов';
+            if(avgLabel) avgLabel.textContent = 'Средняя сумма';
+            if(finalHeader) finalHeader.textContent = 'Сумма';
+        } else {
+            if(methodEl) methodEl.textContent = '➗ Среднее арифметическое';
+            if(avgLabel) avgLabel.textContent = 'Средний балл';
+            if(finalHeader) finalHeader.textContent = 'Ср. балл';
+        }
+        
+        updateAllAverages();
+    }
+
+
+    function initializeTables() {
+        initializeGradesTable();
+        initializeAttendanceTable();
+    }
+
+    function initializeGradesTable() {
+        const gradesBody = document.getElementById('grades-body');
+        if (!gradesBody) return;
+        gradesBody.innerHTML = '';
+        studentsData.forEach(studentData => {
+            const row = gradesBody.insertRow();
+            row.setAttribute('data-student-id', studentData.student.id);
+            const nameCell = row.insertCell(0);
+            nameCell.className = 'student-name';
+            nameCell.textContent = `${studentData.student.last_name} ${studentData.student.first_name}`;
+            const avgCell = row.insertCell(1);
+            avgCell.className = 'average-cell';
+            avgCell.textContent = '-'; 
+        });
+    }
+
+    function initializeAttendanceTable() {
+        const attendanceBody = document.getElementById('attendance-body');
+        if (!attendanceBody) return;
+        attendanceBody.innerHTML = '';
+        studentsData.forEach(function(studentData) {
+            const row = attendanceBody.insertRow();
+            row.setAttribute('data-student-id', studentData.student.id);
+            const nameCell = row.insertCell(0);
+            nameCell.className = 'student-name';
+            nameCell.textContent = studentData.student.last_name + ' ' + studentData.student.first_name;
+            const percentCell = row.insertCell(1);
+            percentCell.className = 'attendance-percent-cell';
+            percentCell.textContent = '0%';
+        });
+        const headerRow = document.getElementById('attendance-header').rows[0];
+        if (headerRow) headerRow.cells[headerRow.cells.length - 1].textContent = 'Посещ.';
+    }
+
+
+    function updateCurrentColumnId(idString) {
+        if (!idString) return;
+        const parts = idString.split('-');
+        const num = parseInt(parts[parts.length - 1]);
+        if (!isNaN(num) && num >= currentColumnId) currentColumnId = num + 1;
+    }
+
+    async function loadDataSequence() {
+        await loadSavedLessons();
+        await loadSavedGrades();
+        await loadSavedAttendance();
+        updateAllAverages();
+        updateAttendanceStats();
+    }
+
+    async function loadSavedLessons() {
+        try {
+            const gResp = await fetch(`/teacher/get_lessons_data?assignment_id=${assignmentId}&data_type=grades`);
+            const gLessons = await gResp.json();
+            const processedIds = new Set();
+            gLessons.forEach(l => {
+                lessonsMap[l.lesson_column_id] = { date: l.date, topic: l.topic, isImportant: l.is_important ? 1 : 0 };
+                createUnifiedColumn(l.lesson_column_id, l.date, l.topic, l.is_important ? 1 : 0);
+                updateCurrentColumnId(l.lesson_column_id);
+                processedIds.add(l.lesson_column_id);
+            });
+            const aResp = await fetch(`/teacher/get_lessons_data?assignment_id=${assignmentId}&data_type=attendance`);
+            const aLessons = await aResp.json();
+            aLessons.forEach(l => {
+                if(!processedIds.has(l.lesson_column_id)) {
+                     lessonsMap[l.lesson_column_id] = { date: l.date, topic: l.topic, isImportant: 0 };
+                     createUnifiedColumn(l.lesson_column_id, l.date, l.topic, 0);
+                     updateCurrentColumnId(l.lesson_column_id);
+                }
+            });
+        } catch (error) { console.error(error); }
+    }
+
+    async function loadSavedGrades() {
+        try {
+            const response = await fetch(`/teacher/get_grades?assignment_id=${assignmentId}`);
+            if (response.ok) {
+                const grades = await response.json();
+                grades.forEach(grade => {
+                    const selector = `#grades-body td[data-student-id="${grade.student_id}"][data-column-id="${grade.lesson_column_id}"]`;
+                    const cell = document.querySelector(selector);
+                    if (cell) {
+                        const val = grade.display_value !== null && grade.display_value !== "" ? grade.display_value : grade.value;
+                        cell.textContent = val;
+                        updateGradeCellStyle(cell, String(val));
+                    }
+                });
+            }
+        } catch (error) { console.error(error); }
+    }
+
+async function loadSavedAttendance() {
+        try {
+            const response = await fetch(`/teacher/get_attendance?assignment_id=${assignmentId}`);
+            const att = await response.json();
+            
+            att.forEach(record => {
+
+                const selector = `#attendance-body td[data-student-id="${record.student_id}"][data-column-id="${record.lesson_column_id}"]`;
+                
+
+                const cell = document.querySelector(selector);
+                
+   
+                if (cell && record.status && record.status !== 'none') {
+                    cell.textContent = record.status;
+                    
+
+                    if (record.status === '+') {
+                        cell.className = 'attendance-cell present';
+                    } else if (record.status === 'УП') {
+                        cell.className = 'attendance-cell excused';
+                    } else if (record.status === 'НП' || record.status === '-') {
+                        cell.textContent = 'НП'; // Приводим старые минусы к НП
+                        cell.className = 'attendance-cell absent';
+                    } else {
+                        cell.className = 'attendance-cell empty';
+                    }
+                }
+            });
+            updateAttendanceStats(); 
+        } catch (error) { console.error("Ошибка загрузки посещаемости:", error); }
+    }
+
+    function createUnifiedColumn(columnId, date, topic, isImportant = 0) {
+        if (!lessonsMap[columnId]) lessonsMap[columnId] = { date, topic, isImportant };
+        createGradeColumnUI(columnId, date, topic, isImportant);
+        createAttendanceColumnUI(columnId, date, topic);
+        setupHeaderEditing(); 
+    }
+
+    function createGradeColumnUI(columnId, date, topic, isImportant) {
+        const headerRow = document.getElementById('grades-header').rows[0];
+        const insertIndexHeader = headerRow.cells.length - 1; 
+        const headerCell = document.createElement('th');
+        headerCell.className = 'header-cell';
+        headerCell.setAttribute('data-column-id', columnId);
+        const starClass = isImportant === 1 ? 'importance-star active' : 'importance-star';
+
+        headerCell.innerHTML = `
+            <span class="${starClass}" onclick="toggleImportance('${columnId}', this)" title="Важная работа">★</span>
+            <div class="date-header" style="cursor:pointer">${date}</div>
+            <div class="topic-header" style="cursor:pointer">${topic || 'Тема'}</div>
+            <button class="delete-column-btn" onclick="deleteUnifiedColumn('${columnId}')">×</button>
+        `;
+        headerRow.insertBefore(headerCell, headerRow.cells[insertIndexHeader]);
+
+        const tableBody = document.getElementById('grades-body');
+        for (let i = 0; i < tableBody.rows.length; i++) {
+            const row = tableBody.rows[i];
+            const insertIndexBody = row.cells.length - 1;
+            const gradeCell = row.insertCell(insertIndexBody);
+            gradeCell.className = 'grade-cell empty';
+            gradeCell.setAttribute('data-student-id', row.getAttribute('data-student-id'));
+            gradeCell.setAttribute('data-column-id', columnId);
+            setupGradeCellEditing(gradeCell);
+        }
+    }
+
+    function createAttendanceColumnUI(columnId, date, topic) {
+        const headerRow = document.getElementById('attendance-header').rows[0];
+        const insertIndexHeader = headerRow.cells.length - 1;
+        const headerCell = document.createElement('th');
+        headerCell.className = 'header-cell';
+        headerCell.setAttribute('data-column-id', columnId);
+        headerCell.innerHTML = `
+            <div class="date-header">${date}</div>
+            <div class="topic-header">${topic || 'Занятие'}</div>
+            <button class="delete-column-btn" onclick="deleteUnifiedColumn('${columnId}')">×</button>
+        `;
+        headerRow.insertBefore(headerCell, headerRow.cells[insertIndexHeader]);
+        const tableBody = document.getElementById('attendance-body');
+        for (let i = 0; i < tableBody.rows.length; i++) {
+            const row = tableBody.rows[i];
+            const insertIndexBody = row.cells.length - 1;
+            const cell = row.insertCell(insertIndexBody);
+            cell.className = 'attendance-cell empty';
+            cell.setAttribute('data-student-id', row.getAttribute('data-student-id'));
+            cell.setAttribute('data-column-id', columnId);
+            cell.onclick = function() { handleAttendanceClick(this); };
+        }
+    }
+
+    function toggleImportance(columnId, starElement) {
+        starElement.classList.toggle('active');
+        const isNowImportant = starElement.classList.contains('active') ? 1 : 0;
+        if(lessonsMap[columnId]) lessonsMap[columnId].isImportant = isNowImportant;
+        const info = lessonsMap[columnId];
+        saveLessonData(columnId, info.date, info.topic, 'grades', isNowImportant); 
+        updateAllAverages();
+    }
+
+
+    function scrollToNewColumn(columnId) {
+   
+        const activeTab = document.querySelector('.tab-content.active');
+        if (!activeTab) return;
+
+
+        const newHeader = activeTab.querySelector(`th[data-column-id="${columnId}"]`);
+
+        if (newHeader) {
+
+            newHeader.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center', 
+                block: 'nearest'
+            });
+
+           
+            const originalBg = newHeader.style.backgroundColor;
+            newHeader.style.transition = 'background-color 0.5s';
+            newHeader.style.backgroundColor = '#fff3cd';
+            
+            setTimeout(() => {
+                newHeader.style.backgroundColor = originalBg; 
+            }, 1000);
+        }
+    }
+    
+
+function addGradeColumn() { 
+        const columnId = 'lesson-' + currentColumnId++;
+        const dateObj = new Date();
+        const today = `${String(dateObj.getDate()).padStart(2,'0')}.${String(dateObj.getMonth()+1).padStart(2,'0')}.${dateObj.getFullYear()}`;
+        
+        createUnifiedColumn(columnId, today, 'Тема занятия', 0);
+        saveLessonData(columnId, today, 'Тема занятия', 'grades');
+        saveLessonData(columnId, today, 'Тема занятия', 'attendance');
+
+        
+        setTimeout(() => {
+            scrollToNewColumn(columnId);
+        }, 100);
+    
+    }
+    function addAttendanceColumn() { addGradeColumn(); }
+
+   
+
+    function setupGradeCellEditing(cell) {
+        cell.addEventListener('click', function(e) {
+            if (currentEditingCell && currentEditingCell !== this) {
+                const input = currentEditingCell.querySelector('input');
+                const val = input ? input.value : currentEditingCell.textContent;
+                finishGradeEditing(currentEditingCell, val);
+            }
+            if (currentEditingCell !== this) {
+                startGradeEditing(this);
+            }
+        });
+    }
+
+    function startGradeEditing(cell) {
+        currentEditingCell = cell;
+        const currentValue = cell.textContent;
+        cell.setAttribute('data-original-value', currentValue);
+        
+        const input = document.createElement('input');
+        input.type = 'text'; 
+        input.value = currentValue;
+        input.className = 'grade-input';
+        
+        input.style.cssText = `width: 100%; height: 100%; border: none; outline: none; background: transparent; text-align: center; font-family: inherit; font-size: inherit; padding: 0; margin: 0; color: inherit;`;
+        
+        cell.textContent = '';
+        cell.appendChild(input);
+        input.focus();
+        input.select();
+
+       
+        input.addEventListener('blur', () => finishGradeEditing(cell, input.value));
+
+        
+        input.addEventListener('keydown', (e) => { 
+            
+            if (e.key === 'Enter') {
+                
+                moveFocus(cell, 'down');
+                e.preventDefault(); 
+                return;
+            }
+
+          
+            const arrows = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            if (arrows.includes(e.key)) {
+                e.preventDefault(); 
+                
+                
+                let direction = '';
+                if (e.key === 'ArrowUp') direction = 'up';
+                if (e.key === 'ArrowDown') direction = 'down';
+                if (e.key === 'ArrowLeft') direction = 'left';
+                if (e.key === 'ArrowRight') direction = 'right';
+
+                moveFocus(cell, direction);
+            }
+        });
+    }
+
+  
+    function moveFocus(currentCell, direction) {
+        const currentRow = currentCell.parentElement;
+        const colIndex = currentCell.cellIndex;
+        let targetCell = null;
+
+        if (direction === 'up') {
+            const prevRow = currentRow.previousElementSibling;
+            if (prevRow) targetCell = prevRow.cells[colIndex];
+        } 
+        else if (direction === 'down') {
+            const nextRow = currentRow.nextElementSibling;
+            if (nextRow) targetCell = nextRow.cells[colIndex];
+        } 
+        else if (direction === 'left') {
+            targetCell = currentCell.previousElementSibling;
+        } 
+        else if (direction === 'right') {
+            targetCell = currentCell.nextElementSibling;
+        }
+
+       
+        if (targetCell && targetCell.classList.contains('grade-cell')) {
+           
+            targetCell.click();
+        } else {
+           
+            const input = currentCell.querySelector('input');
+            if(input) input.blur();
+        }
+    }
+
+    function finishGradeEditing(cell, newValue) {
+        if (!cell.contains(document.querySelector('input'))) return;
+        let trimmedValue = newValue.trim();
+        
+   
+        if (gradingSystem.type === 'letter' && trimmedValue.length > 0) {
+            trimmedValue = trimmedValue.toUpperCase();
+        }
+
+        if (trimmedValue === '') {
+            cell.textContent = '';
+            cell.className = 'grade-cell empty';
+            cell.style.backgroundColor = ''; 
+            saveGrade(cell);
+        } else if (validateGrade(trimmedValue)) {
+            cell.textContent = trimmedValue;
+            updateGradeCellStyle(cell, trimmedValue);
+            saveGrade(cell);
+        } else {
+       
+            cell.style.backgroundColor = '#ffe6e6';
+            setTimeout(() => { 
+                cell.textContent = cell.getAttribute('data-original-value');
+                updateGradeCellStyle(cell, cell.textContent);
+            }, 500);
+        }
+        currentEditingCell = null;
+        updateAllAverages();
+    }
+
+   
+    function validateGrade(grade) {
+        if (gradingSystem.type === 'custom') return true; 
+        if (!grade || grade.trim() === '') return true;
+        
+        const strGrade = String(grade).trim().toUpperCase();
+
+        switch(gradingSystem.type) {
+            case 'points':
+            case 'percentage':
+              
+                const isNumber = /^-?\d+([.,]\d+)?$/.test(strGrade);
+                if (!isNumber) return false;
+
+                const num = parseFloat(strGrade.replace(',', '.'));
+                
+               
+                const min = gradingSystem.minPoints !== undefined ? gradingSystem.minPoints : -1000;
+                const max = gradingSystem.maxPoints !== undefined ? gradingSystem.maxPoints : 1000;
+                
+                return !isNaN(num) && num >= min && num <= max;
+
+            case 'letter': 
+                return /^[ABCDF][+-]?$/.test(strGrade);
+            default: return true;
+        }
+    }
+
+    function isBadValue(value) {
+        if (!value) return false;
+        const lowerVal = String(value).toLowerCase().trim();
+        
+        if (gradingSystem.type === 'custom') {
+            const strictBad = ['2', '1', '0', 'н', 'н/я', 'no', 'fail', 'bad', 'минус', 'незачет'];
+            if (strictBad.includes(lowerVal)) return true;
+            return false;
+        }
+        return false;
+    }
+
+    function updateGradeCellStyle(cell, grade) {
+        if (!grade || grade === '') {
+            cell.className = 'grade-cell empty';
+            cell.style.backgroundColor = '';
+            return;
+        }
+
+        
+        const rawNum = parseFloat(String(grade).replace(',', '.'));
+        if (!isNaN(rawNum) && rawNum < 0) {
+            cell.className = 'grade-cell fail'; 
+            return;
+        }
+
+        if (gradingSystem.type === 'custom') {
+            if (isBadValue(grade)) cell.className = 'grade-cell fail';
+            else cell.className = 'grade-cell pass';
+            return;
+        }
+        
+        if (gradingSystem.type === 'letter') {
+             const strGrade = String(grade).toUpperCase();
+             if (strGrade.startsWith('F')) cell.className = 'grade-cell fail';
+             else cell.className = 'grade-cell pass';
+             return;
+        }
+        
+        
+        const numVal = convertGradeToNumber(grade);
+        let cellThreshold;
+        if (calculationMethod === 'sum') {
+            const max = gradingSystem.maxPoints || 100;
+            cellThreshold = max / 2;
+        } else {
+            cellThreshold = gradingSystem.passingGrade !== undefined ? gradingSystem.passingGrade : 60;
+        }
+
+        if (numVal >= cellThreshold) cell.className = 'grade-cell pass';
+        else cell.className = 'grade-cell fail';
+    }
+
+    function convertGradeToNumber(grade) {
+        if (!grade) return 0;
+        const strGrade = String(grade).trim().toUpperCase();
+
+        if (gradingSystem.type === 'custom') {
+            const val = parseFloat(strGrade.replace(',', '.'));
+            return isNaN(val) ? 0 : val;
+        }
+        try {
+            if (gradingSystem.type === 'letter') {
+                const baseMap = {'A': 95, 'B': 85, 'C': 75, 'D': 65, 'F': 50};
+                const letter = strGrade.charAt(0);
+                const modifier = strGrade.length > 1 ? strGrade.charAt(1) : '';
+                let score = baseMap[letter];
+                if (score === undefined) return 0;
+                if (letter === 'F') return 50;
+                if (score > 0) {
+                    if (modifier === '+') score = Math.min(100, score + 4);
+                    else if (modifier === '-') score = Math.max(0, score - 4);
+                }
+                return score;
+            }
+          
+            let val = parseFloat(strGrade.replace(',', '.').replace('%', ''));
+            return isNaN(val) ? 0 : val;
+        } catch (e) { return 0; }
+    }
+
+    function updateAllAverages() {
+        const table = document.getElementById('grades-table');
+        if(!table) return;
+        
+        let totalSumAvgs = 0;
+        let studentsWithGrades = 0;
+        let totalIndividualGrades = 0;
+        const passing = gradingSystem.passingGrade !== undefined ? gradingSystem.passingGrade : 60;
+
+        for (let i = 1; i < table.rows.length; i++) {
+            const row = table.rows[i];
+            let sum = 0, cnt = 0;
+            let missingImportant = false; 
+            let badCount = 0; 
+            let goodCount = 0;
+
+            for (let j = 1; j < row.cells.length - 1; j++) {
+                const cell = row.cells[j];
+                const colId = cell.getAttribute('data-column-id');
+                const valStr = cell.textContent.trim();
+                const isImportantColumn = lessonsMap[colId] && lessonsMap[colId].isImportant === 1;
+
+                if (valStr !== '') {
+                    const val = convertGradeToNumber(valStr);
+                    sum += val; 
+                    cnt++;
+                    totalIndividualGrades++;
+
+                    if (gradingSystem.type === 'custom' && isBadValue(valStr)) {
+                        badCount++;
+                        if (isImportantColumn) missingImportant = true;
+                    } else if (gradingSystem.type === 'letter' && valStr.toUpperCase().startsWith('F')) {
+                         if (isImportantColumn) missingImportant = true;
+                    }
+                } else {
+                    if (isImportantColumn) missingImportant = true;
+                }
+            }
+            
+            const avgCell = row.cells[row.cells.length - 1];
+            
+            if (cnt === 0 && !missingImportant) {
+                avgCell.textContent = '-';
+                avgCell.className = 'average-cell';
+            } else {
+                if (gradingSystem.type === 'custom') {
+                    let isPass = true;
+                    if (missingImportant) isPass = false; 
+                    else if (cnt > 0 && badCount > goodCount) isPass = false; 
+                    avgCell.textContent = isPass ? "Зачет" : "Незачет";
+                    avgCell.className = isPass ? 'average-cell pass' : 'average-cell fail';
+                    if (isPass) studentsWithGrades++;
+                } 
+                else {
+                    let finalScore = 0;
+                    if (calculationMethod === 'sum') {
+                        finalScore = sum;
+                        avgCell.textContent = finalScore.toFixed(0); 
+                    } else {
+                        finalScore = cnt > 0 ? (sum / cnt) : 0;
+                        avgCell.textContent = finalScore.toFixed(1);
+                    }
+
+                    let isPass = true;
+                    if (missingImportant) isPass = false;
+                    else if (finalScore < passing) isPass = false;
+
+                    avgCell.className = isPass ? 'average-cell pass' : 'average-cell fail';
+                    if (cnt > 0) {
+                        totalSumAvgs += finalScore;
+                        studentsWithGrades++; 
+                    }
+                }
+            }
+        }
+        
+        const avgDisplay = document.getElementById('avg-grade');
+        if(avgDisplay) {
+            if (gradingSystem.type === 'custom') {
+                 avgDisplay.textContent = studentsWithGrades; 
+            } else {
+                 const groupAvg = studentsWithGrades > 0 ? totalSumAvgs / studentsWithGrades : 0;
+                 avgDisplay.textContent = groupAvg.toFixed(1);
+            }
+        }
+        const totalDisplay = document.getElementById('total-grades');
+        if(totalDisplay) totalDisplay.textContent = totalIndividualGrades; 
+    }
+
+    async function saveGrade(cell) {
+        const studentId = cell.getAttribute('data-student-id');
+        const columnId = cell.getAttribute('data-column-id'); 
+        if (!columnId) return;
+        let val = cell.textContent.trim();
+        let valToSend = val === '' ? null : val;
+        
+        if (gradingSystem.type === 'points' || gradingSystem.type === 'percentage') {
+             if(valToSend) {
+                 
+                 valToSend = valToSend.replace(',', '.');
+                 if(isNaN(parseFloat(valToSend))) return; 
+             }
+        }
+
+        try {
+            await fetch('/teacher/save_grade', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    student_id: studentId,
+                    teacher_subject_group_id: assignmentId,
+                    grade_value: valToSend,
+                    lesson_column_id: columnId
+                })
+            });
+        } catch (e) { console.error(e); }
+    }
+    
+   
+    
+    function saveLessonData(columnId, date, topic, type, isImp) {
+        const isImportant = (isImp !== undefined) ? isImp : (lessonsMap[columnId] ? lessonsMap[columnId].isImportant : 0);
+        fetch('/teacher/save_lesson_data', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                teacher_subject_group_id: assignmentId, lesson_column_id: columnId,
+                date: date, topic: topic, table_type: type, is_important: isImportant
+            })
+        });
+    }
+async function saveAttendance(cell) {
+        const studentId = cell.getAttribute('data-student-id');
+        const columnId = cell.getAttribute('data-column-id');
+        const status = cell.textContent.trim();
+        
+        
+        console.log(`Отправка: Студент ${studentId}, Колонна ${columnId}, Статус "${status}"`);
+
+        try {
+            const response = await fetch('/teacher/save_attendance', {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: studentId, 
+                    teacher_subject_group_id: assignmentId,
+                    attendance_status: status === '' ? 'none' : status, 
+                    lesson_column_id: columnId
+                })
+            });
+            
+            if (!response.ok) {
+            
+                const errData = await response.json();
+                console.error("ОШИБКА СЕРВЕРА:", errData);
+                alert("Ошибка сохранения! Проверьте консоль.");
+                cell.style.border = "2px solid red"; 
+            } else {
+                console.log("Успешно сохранено");
+                cell.style.border = ""; 
+            }
+        } catch (e) { 
+            console.error("ОШИБКА СЕТИ:", e);
+            alert("Не удалось соединиться с сервером");
+        }
+    }
+function handleAttendanceClick(cell) {
+        const current = cell.textContent.trim();
+        let next = '';
+        let cls = 'attendance-cell empty';
+
+     
+        
+        if (current === '' || current === 'none') {
+            next = '+';
+            cls = 'attendance-cell present';
+        } 
+        else if (current === '+') {
+            next = 'УП';
+            cls = 'attendance-cell excused'; 
+        } 
+        else if (current === 'УП') {
+            next = 'НП';
+            cls = 'attendance-cell absent'; 
+        } 
+        else if (current === 'НП') {
+            next = '';
+            cls = 'attendance-cell empty';
+        }
+
+        cell.textContent = next;
+        cell.className = cls;
+        
+        saveAttendance(cell); 
+        updateAttendanceStats();
+    }
+
+    function deleteUnifiedColumn(colId) {
+        if(!confirm('Удалить это занятие?')) return;
+        Promise.all([
+            fetch('/teacher/delete_lesson', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ teacher_subject_group_id: assignmentId, lesson_column_id: colId, table_type: 'grades' })
+            }),
+            fetch('/teacher/delete_lesson', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ teacher_subject_group_id: assignmentId, lesson_column_id: colId, table_type: 'attendance' })
+            })
+        ]).then(() => location.reload());
+    }
+    function setupHeaderEditing() {
+       
+        const makeTopicEditable = (element) => {
+            
+            const newEl = element.cloneNode(true);
+            element.parentNode.replaceChild(newEl, element);
+            
+            newEl.onclick = function() {
+                const oldVal = this.textContent.trim();
+                const input = document.createElement('input');
+                input.value = oldVal;
+                input.style.cssText = "width: 100%; border: none; background: transparent; text-align: center; font: inherit; outline: none; padding: 0; margin: 0;";
+                
+                this.textContent = '';
+                this.appendChild(input);
+                input.focus();
+                input.select();
+
+                const save = () => {
+                    let newVal = input.value.trim() || oldVal;
+                    this.textContent = newVal;
+                    saveChanges(this, newVal, true); 
+                };
+
+                input.onblur = save;
+                input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
+            }
+        };
+
+        
+        const makeDateEditable = (element) => {
+            const newEl = element.cloneNode(true);
+            element.parentNode.replaceChild(newEl, element);
+
+            newEl.onclick = function() {
+             
+                const parts = this.textContent.trim().split('.');
+                let isoDate = '';
+                if (parts.length === 3) {
+                   
+                    isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+
+                const input = document.createElement('input');
+                input.type = 'date'; 
+                input.value = isoDate;
+                
+              
+                input.style.cssText = "border: none; background: transparent; font-family: inherit; font-size: inherit; width: 110px;";
+                
+                this.textContent = '';
+                this.appendChild(input);
+                input.focus();
+                
+               
+                if (input.showPicker) {
+                    try { input.showPicker(); } catch(e) {}
+                }
+
+                const save = () => {
+                    if (!input.value) {
+                         location.reload(); 
+                         return;
+                    }
+
+                
+                    const dParts = input.value.split('-');
+                    const ruDate = `${dParts[2]}.${dParts[1]}.${dParts[0]}`;
+                    
+                    this.textContent = ruDate;
+                    saveChanges(this, input.value, false); 
+                };
+
+                input.onblur = save;
+                input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
+            }
+        };
+        
+ 
+        const saveChanges = (element, newVal, isTopic) => {
+            const th = element.closest('th');
+            const colId = th.getAttribute('data-column-id');
+            if(colId) {
+               
+                if (!isTopic) {
+                    
+                     
+                   
+                     const topicVal = th.querySelector('.topic-header').textContent.trim();
+                     
+                     
+                     saveLessonData(colId, newVal, topicVal, 'grades');
+                     saveLessonData(colId, newVal, topicVal, 'attendance');
+                     
+                   
+                     setTimeout(() => location.reload(), 200);
+                     return;
+                }
+
+              
+                if(lessonsMap[colId]) {
+                     lessonsMap[colId].topic = newVal;
+                }
+                
+          
+                const dateVal = th.querySelector('.date-header').textContent.trim();
+                
+              
+                document.querySelectorAll(`th[data-column-id="${colId}"]`).forEach(h => {
+                    const tHeader = h.querySelector('.topic-header');
+                    if (tHeader) tHeader.textContent = newVal;
+                });
+                
+                saveLessonData(colId, dateVal, newVal, 'grades');
+                saveLessonData(colId, dateVal, newVal, 'attendance');
+            }
+        };
+
+
+        document.querySelectorAll('.topic-header').forEach(el => makeTopicEditable(el));
+        document.querySelectorAll('.date-header').forEach(el => makeDateEditable(el));
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        const content = document.getElementById(tabName + '-tab');
+        if(content) content.classList.add('active');
+        if (event && event.target) event.target.classList.add('active');
+    }
+    function updateAttendanceStats() {
+        const bodyTable = document.getElementById('attendance-body');
+        const headerTable = document.getElementById('attendance-header');
+        if(!bodyTable || !headerTable) return;
+        const headerCells = headerTable.rows[0].cells;
+        const totalColumnsCount = Math.max(0, headerCells.length - 2);
+        let globalPresentCount = 0; 
+        let globalStudentLessonCount = 0; 
+        for (let i = 0; i < bodyTable.rows.length; i++) {
+            const row = bodyTable.rows[i];
+            let presentInRow = 0;
+            for (let j = 1; j < row.cells.length - 1; j++) {
+                if (row.cells[j].textContent.trim() === '+') presentInRow++;
+            }
+            const rowPercent = totalColumnsCount > 0 ? Math.round((presentInRow / totalColumnsCount) * 100) : 0;
+            row.cells[row.cells.length - 1].textContent = rowPercent + '%';
+            globalPresentCount += presentInRow;
+        }
+        const totalStudents = bodyTable.rows.length;
+        globalStudentLessonCount = totalStudents * totalColumnsCount;
+        const totalAvg = globalStudentLessonCount > 0 ? Math.round((globalPresentCount / globalStudentLessonCount) * 100) : 0;
+        const attDisplay = document.getElementById('avg-attendance');
+        if(attDisplay) attDisplay.textContent = totalAvg + '%';
+        const totalDisplay = document.getElementById('total-lessons');
+        if(totalDisplay) totalDisplay.textContent = totalColumnsCount;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('🚀 Запуск...');
+        await loadStudents();
+        await loadGradingSystem();
+        initializeTables();
+        await loadDataSequence();
+        console.log('✅ Готово');
+    });
+</script>
+</body>
+</html>

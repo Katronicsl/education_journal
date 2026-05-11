@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Регистрация студента | NovCheck</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f7fa;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+.bg-text-repeated {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+.bg-text-repeated span {
+    position: absolute;
+    left: 0; top: 45%;
+    font-size: 55px;
+    font-weight: bold;
+    color: rgba(0, 47, 167, 0.08);
+    letter-spacing: 0.3em;
+    white-space: nowrap;
+    width: 300vw;
+    animation: move-bg 13s linear infinite;
+    user-select: none;
+    pointer-events: none;
+}
+@keyframes move-bg {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-45vw);}
+}
+.container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 450px;
+    min-width: 310px;
+    margin: 42px auto;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+}
+.logo {
+    width: 110px;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 8px;
+    user-select: none;
+}
+.form-header h2 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+.form-header p {
+    color: #555;
+    margin-bottom: 18px;
+    font-size: 17px;
+}
+
+.form-divider {
+    width: 100%;
+    height: 0;
+    border-bottom: 1px solid #e1e5e9;
+    margin: 0 0 25px 0;
+}
+.form-section { margin-bottom: 25px; padding-bottom: 18px; border-bottom: 1px solid #e1e5e9; }
+.form-section:last-of-type { border-bottom: none; margin-bottom: 12px; }
+.form-section-title { font-size: 18px; color: #333; margin-bottom: 14px; font-weight: bold; margin-left: 4px; }
+.form-group { margin-bottom: 19px; text-align: left; }
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+    color: #002FA7;
+    font-size: 15px;
+}
+.required::after { content: " *"; color: #ff0000; }
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    background-color: #fafbfc;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: #002FA7;
+    background-color: #fff;
+}
+select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+.select-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 3px;
+    font-style: italic;
+    margin-left: 2px;
+    min-height: 18px;
+}
+.button, button[type="submit"] {
+    width: 96%;
+    min-width: 280px;
+    max-width: 420px;
+    margin: 0 auto;
+    display: block;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 18px;
+    background-color: #002FA7;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    border-radius: 13px;
+    box-shadow: 0 8px 18px rgba(41,121,255,0.5);
+    transition: background-color 0.22s, color 0.22s, box-shadow 0.22s, transform 0.16s;
+    user-select: none;
+    cursor: pointer;
+    margin-top: 16px;
+}
+.button:hover, button[type="submit"]:hover {
+    background-color: #EEA200;
+    color: #ffffff;
+    box-shadow: 0 4px 11px rgba(21, 101, 192, 0.7);
+    transform: translateY(2px);
+}
+.button:active, button[type="submit"]:active {
+    background-color: #c96b00;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(7, 30, 131, 0.85);
+    transform: translateY(3px);
+    filter: brightness(80%);
+}
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+    font-size: 15px;
+}
+.login-link a {
+    color: #002FA7;
+    text-decoration: none;
+    font-weight: bold;
+}
+.login-link a:hover { text-decoration: underline; }
+.hidden-data { display: none; }
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #e53935;
+    font-size: 14px;
+}
+.success-message {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #4caf50;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="bg-text-repeated"><span>НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ &nbsp; НОВГУ</span></div>
+<div class="container">
+    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="НовГУ" class="logo">
+    <div class="form-header">
+        <h2>Регистрация студента</h2>
+        <p>Заполните все поля для создания аккаунта</p>
+    </div>
+    <div class="form-divider"></div>
+    <div id="univs-data" class="hidden-data" data-univs='{{ univs_data | tojson | safe }}'></div>
+    {% if message %}
+    <div class="{{ 'error-message' if error else 'success-message' }}">
+        {{ message }}
+    </div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('auth.register') }}">
+        <div class="form-section">
+            <div class="form-section-title">Личная информация</div>
+            <div class="form-group">
+                <label for="last_name" class="required">Фамилия</label>
+                <input id="last_name" name="last_name" type="text" required placeholder="Иванов" value="{{ request.form.last_name if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="first_name" class="required">Имя</label>
+                <input id="first_name" name="first_name" type="text" required placeholder="Иван" value="{{ request.form.first_name if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="middle_name">Отчество</label>
+                <input id="middle_name" name="middle_name" type="text" placeholder="Иванович (если есть)" value="{{ request.form.middle_name if request.form }}">
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="form-section-title">Основная информация</div>
+            <div class="form-group">
+                <label for="email" class="required">Электронная почта</label>
+                <input id="email" name="email" type="email" required placeholder="example@university.ru" value="{{ request.form.email if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="password" class="required">Пароль</label>
+                <input id="password" name="password" type="password" required placeholder="Не менее 6 символов" minlength="6">
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="form-section-title">Учебная информация</div>
+            <div class="form-group">
+                <label for="university" class="required">Университет/Колледж</label>
+                <select id="university" name="university" required>
+                    <option value="">-- Выберите учебное заведение --</option>
+                </select>
+                <div class="select-hint" id="univ-hint">Сначала выберите университет</div>
+            </div>
+            <div class="form-group">
+                <label for="course" class="required">Курс</label>
+                <select id="course" name="course" required disabled>
+                    <option value="">-- Сначала выберите университет --</option>
+                </select>
+                <div class="select-hint" id="course-hint">Станет доступен после выбора университета</div>
+            </div>
+            <div class="form-group">
+                <label for="group" class="required">Группа</label>
+                <select id="group" name="group" required disabled>
+                    <option value="">-- Сначала выберите курс --</option>
+                </select>
+                <div class="select-hint" id="group-hint">Станет доступен после выбора курса</div>
+            </div>
+        </div>
+        <input type="hidden" name="role" value="student" />
+        <button type="submit" class="button">Зарегистрироваться</button>
+    </form>
+    <div class="login-link">
+        Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Вход</a>
+    </div>
+</div>
+<script>
+const univsDataEl = document.getElementById('univs-data');
+const univsDataJson = univsDataEl.getAttribute('data-univs');
+const univsData = JSON.parse(univsDataJson || '{}');
+const universitySelect = document.getElementById('university');
+const courseSelect = document.getElementById('course');
+const groupSelect = document.getElementById('group');
+const univHint = document.getElementById('univ-hint');
+const courseHint = document.getElementById('course-hint');
+const groupHint = document.getElementById('group-hint');
+function parseCourseNumber(courseName) {
+    const match = courseName.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 9999;
+}
+function populateUniversities() {
+    universitySelect.innerHTML = '<option value="">-- Выберите учебное заведение --</option>';
+    Object.keys(univsData).sort().forEach(univ => {
+        const opt = document.createElement('option');
+        opt.value = univ;
+        opt.textContent = univ;
+        universitySelect.appendChild(opt);
+    });
+    courseSelect.innerHTML = '<option value="">-- Сначала выберите университет --</option>';
+    courseSelect.disabled = true;
+    groupSelect.innerHTML = '<option value="">-- Сначала выберите курс --</option>';
+    groupSelect.disabled = true;
+    univHint.textContent = 'Сначала выберите университет';
+    courseHint.textContent = 'Станет доступен после выбора университета';
+    groupHint.textContent = 'Станет доступен после выбора курса';
+}
+function populateCourses(univ) {
+    courseSelect.innerHTML = '<option value="">-- Выберите курс --</option>';
+    groupSelect.innerHTML = '<option value="">-- Сначала выберите курс --</option>';
+    groupSelect.disabled = true;
+    if (!univ || !univsData[univ]) {
+        courseSelect.disabled = true;
+        groupSelect.disabled = true;
+        return;
+    }
+    const courses = Object.keys(univsData[univ]);
+    courses.sort((a,b) => parseCourseNumber(a) - parseCourseNumber(b));
+    courses.forEach(course => {
+        const opt = document.createElement('option');
+        opt.value = course;
+        opt.textContent = course;
+        courseSelect.appendChild(opt);
+    });
+    courseSelect.disabled = false;
+}
+function populateGroups(univ, course) {
+    groupSelect.innerHTML = '<option value="">-- Выберите группу --</option>';
+    if (!univ || !course || !univsData[univ] || !univsData[univ][course]) {
+        groupSelect.disabled = true;
+        return;
+    }
+    const groups = univsData[univ][course].slice().sort();
+    groups.forEach(group => {
+        const opt = document.createElement('option');
+        opt.value = group;
+        opt.textContent = group;
+        groupSelect.appendChild(opt);
+    });
+    groupSelect.disabled = false;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    populateUniversities();
+
+    universitySelect.addEventListener('change', () => {
+        if (!universitySelect.value) {
+            
+            courseSelect.innerHTML = '<option value="">-- Сначала выберите университет --</option>';
+            courseSelect.disabled = true;
+            groupSelect.innerHTML = '<option value="">-- Сначала выберите курс --</option>';
+            groupSelect.disabled = true;
+            univHint.textContent = 'Сначала выберите университет';
+            courseHint.textContent = 'Станет доступен после выбора университета';
+            groupHint.textContent = 'Станет доступен после выбора курса';
+        } else {
+            populateCourses(universitySelect.value);
+            courseHint.textContent = 'Теперь выберите курс';
+            univHint.textContent = '';
+            groupHint.textContent = 'Сначала выберите курс';
+        }
+    });
+
+    courseSelect.addEventListener('change', () => {
+        if (!courseSelect.value) {
+            groupSelect.innerHTML = '<option value="">-- Сначала выберите курс --</option>';
+            groupSelect.disabled = true;
+            groupHint.textContent = 'Сначала выберите курс';
+            courseHint.textContent = 'Теперь выберите курс';
+        } else {
+            populateGroups(universitySelect.value, courseSelect.value);
+            groupHint.textContent = 'Теперь выберите группу';
+            courseHint.textContent = '';
+        }
+    });
+
+    groupSelect.addEventListener('change', () => {
+        if (groupSelect.value) {
+            groupHint.textContent = '';
+        } else if (courseSelect.value) {
+            groupHint.textContent = 'Теперь выберите группу';
+        }
+    });
+
+    document.querySelector('form').addEventListener('submit', e => {
+        if (!universitySelect.value || !courseSelect.value || !groupSelect.value) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите университет, курс и группу');
+        }
+    });
+});
+</script>
+</body>
+</html>

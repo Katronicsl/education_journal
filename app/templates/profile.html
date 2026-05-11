@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Профиль пользователя</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f7fafd;
+    color: #304050;
+  }
+  header {
+    background: linear-gradient(90deg, #002FA7 60%, #3359D1 100%);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom-left-radius: 34px;
+    border-bottom-right-radius: 34px;
+    box-shadow: 0 3px 12px #002fa722;
+    position: relative;
+    z-index: 2;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: #e5eaf8;
+    opacity: 0.18;
+    border-bottom-left-radius: 34px;
+    border-bottom-right-radius: 34px;
+    pointer-events: none;
+  }
+  .logo-img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 18px;
+    background: #fff;
+    user-select: none;
+  }
+  nav {
+    display: flex;
+    gap: 8px;
+  }
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: background 0.22s, color 0.15s;
+  }
+  nav a:hover,
+  nav a:focus {
+    background: #EEA200;
+    color: #ffffff;
+  }
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 2px;
+  }
+  .username {
+    font-size: 15px;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  
+  .profile-info button[type="submit"] {
+    padding: 13px 32px;
+    border: none;
+    border-radius: 14px;
+    background: #343698; 
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.21s;
+  }
+  .profile-info button[type="submit"]:hover {
+    background: #EEA200;
+  }
+
+  
+  .logout-btn {
+    padding: 13px 32px;
+    border: none;
+    border-radius: 14px;
+    background: #F55353; 
+    color: white !important;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.21s;
+    width: auto;
+    font-weight: 600;
+  }
+  .logout-btn:hover {
+    background: #ff7676;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fffdfa;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px #e0eaff3a;
+    padding: 30px 40px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .profile-info {
+    flex: 1;
+    min-width: 280px;
+  }
+  .avatar-section {
+    flex: 0 0 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .avatar-section img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #002FA7;
+    margin-bottom: 20px;
+  }
+  .avatar-section input[type="file"] {
+    display: none;
+  }
+  .upload-label {
+    display: inline-block;
+    background: #002FA7;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.23s;
+    font-weight: 600;
+  }
+  .upload-label:hover {
+    background: #3359D1;
+  }
+  .profile-info h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .profile-info label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #343698;
+  }
+  .profile-info input[type="text"],
+  .profile-info input[type="email"] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 11px;
+    border: 1px solid #b9b9db;
+    font-size: 18px;
+    background: #f0f4ff;
+    color: #304050;
+    margin-bottom: 18px;
+  }
+  .profile-info input[type="text"]:focus,
+  .profile-info input[type="email"]:focus {
+    outline-color: #002FA7;
+    background: #e7f1ff;
+  }
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .user-role {
+    background: #e7f1ff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #002FA7;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+ 
+  #cropModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 1234;
+  }
+  #cropContainer {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 480px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: cover;
+  }
+  #cropImage {
+    max-width: 440px;
+    max-height: 440px;
+    border-radius: 12px;
+  }
+  #cropButtons {
+    margin-top: 15px;
+    display: flex;
+    gap: 14px;
+  }
+  #cropButtons button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #cropButtons .btn-save {
+    background: #002FA7;
+    color: #fff;
+  }
+  #cropButtons .btn-cancel {
+    background: #ddd;
+  }
+  
+  #confirmLogout {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #e7f1ff;
+    color: rgb(0, 0, 0);
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 17px;
+    z-index: 1500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    align-items: center;
+    justify-content: center;
+  }
+  #confirmLogout button {
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 8px 20px;
+    margin-left: 10px;
+    font-size: 16px;
+  }
+  #confirmYes {
+    background: white;
+    color: #000000;
+    border: none;
+  }
+  #confirmNo {
+    background: transparent;
+    border: 2px solid rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img" />
+  <nav>
+    {% if user.role == 'student' %}
+      <a href="{{ url_for('student.dashboard') }}">Главная</a>
+      <a href="{{ url_for('student.rating') }}">Рейтинг</a>
+    {% elif user.role == 'admin' %}
+      <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+      <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+    {% else %}
+      <a href="{{ url_for('teacher.dashboard') }}">Главная</a>
+      <a href="{{ url_for('teacher.student_rating_page') }}">Рейтинг</a>
+    {% endif %}
+    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+  </nav>
+  <div class="header-right">
+    <span class="username">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
+    <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Avatar" class="avatar">
+  </div>
+</header>
+<main>
+  <div class="container">
+    <div class="avatar-section">
+      <img src="{{ url_for('static', filename=user.avatar) }}" alt="Аватар пользователя" id="avatarPreview" />
+      <label class="upload-label" for="avatarUpload">Загрузить аватар</label>
+      <input type="file" id="avatarUpload" accept="image/*" />
+    </div>
+    <div class="profile-info">
+      <h2>Редактирование профиля</h2>
+
+      <div class="user-role">
+        {% if user.role == 'student' %}
+          👨‍🎓 Студент | Группа: {{ user.group_name or 'Не указана' }}
+        {% else %}
+          👨‍🏫 Преподаватель | Кафедра: {{ user.department or 'Не указана' }}
+        {% endif %}
+      </div>
+
+      <form id="profileForm" method="POST" action="{{ url_for('main.profile') }}" enctype="multipart/form-data">
+        <label for="last_name">Фамилия:</label>
+        
+        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required 
+               maxlength="40"
+               oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-ЯёЁ\-]/g, '')"
+               placeholder="Только буквы и дефис" />
+
+        <label for="first_name">Имя:</label>
+    
+        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required 
+               maxlength="40"
+               oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-ЯёЁ\-]/g, '')" />
+
+        <label for="middle_name">Отчество:</label>
+       
+        <input type="text" id="middle_name" name="middle_name" value="{{ user.middle_name or '' }}" 
+               maxlength="40"
+               oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-ЯёЁ\-]/g, '')" />
+
+        <label for="email">Email:</label>
+        
+        <input type="email" id="email" name="email" value="{{ user.email }}" maxlength="100" required />
+
+        {% if user.role == 'student' %}
+          <label for="group">Группа:</label>
+          <input type="text" id="group" name="group" value="{{ user.group_name or '' }}" readonly />
+        {% else %}
+          <label for="department">Кафедра:</label>
+          <input type="text" id="department" name="department" value="{{ user.department or '' }}" maxlength="100" />
+        {% endif %}
+
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" name="phone" value="{{ user.phone or '' }}" maxlength="20"
+               oninput="this.value = this.value.replace(/[^0-9+\-() ]/g, '')"/>
+
+        <div class="button-group">
+          <button type="submit">Сохранить изменения</button>
+          <button id="logoutButton" type="button" class="logout-btn">Выйти</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<div id="cropModal">
+  <div id="cropContainer">
+    <img id="cropImage" src="" alt="Обрезка аватара" />
+    <div id="cropButtons">
+      <button class="btn-save">Сохранить</button>
+      <button class="btn-cancel">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirmLogout">
+  Точно хотите выйти?
+  <button id="confirmYes">Да</button>
+  <button id="confirmNo">Отмена</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+  const avatarInput = document.getElementById('avatarUpload');
+  const avatarPreview = document.getElementById('avatarPreview');
+  const cropModal = document.getElementById('cropModal');
+  const cropImage = document.getElementById('cropImage');
+  const btnSave = cropModal.querySelector('.btn-save');
+  const btnCancel = cropModal.querySelector('.btn-cancel');
+  let cropper;
+
+  avatarInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      cropImage.src = url;
+      cropModal.style.display = 'flex';
+
+      if (cropper) {
+        cropper.destroy();
+      }
+      cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 1,
+        responsive: true,
+        guides: false,
+        background: false,
+        modal: true,
+        movable: true,
+        zoomable: true,
+        rotatable: false,
+        scalable: false
+      });
+    }
+  });
+
+  btnSave.addEventListener('click', () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+      width: 160,
+      height: 160,
+      imageSmoothingQuality: 'high',
+    });
+    avatarPreview.src = canvas.toDataURL();
+
+    let avatarDataInput = document.querySelector('input[name="avatar_data"]');
+    if (!avatarDataInput) {
+      avatarDataInput = document.createElement('input');
+      avatarDataInput.type = 'hidden';
+      avatarDataInput.name = 'avatar_data';
+      profileForm.appendChild(avatarDataInput);
+    }
+    avatarDataInput.value = canvas.toDataURL();
+
+    cropper.destroy();
+    cropper = null;
+    cropModal.style.display = 'none';
+  });
+
+  btnCancel.addEventListener('click', () => {
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+    cropModal.style.display = 'none';
+  });
+
+ 
+  const logoutBtn = document.getElementById('logoutButton');
+  const confirmLogout = document.getElementById('confirmLogout');
+  const confirmYes = document.getElementById('confirmYes');
+  const confirmNo = document.getElementById('confirmNo');
+
+  logoutBtn.addEventListener('click', () => {
+    confirmLogout.style.display = 'flex';
+  });
+
+  confirmYes.addEventListener('click', () => {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    
+    document.cookie.split(";").forEach(function(c) { 
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    });
+
+   
+    window.location.href = "{{ url_for('auth.logout') }}";
+  });
+
+  confirmNo.addEventListener('click', () => {
+    confirmLogout.style.display = 'none';
+  });
+</script>
+</body>
+</html>

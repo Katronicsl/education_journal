@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройка системы оценивания</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:white;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #002FA7, #0056b3);
+            color: white;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px;
+        }
+        .system-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .system-option:hover {
+            border-color: #002FA7;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        .system-option.selected {
+            border-color: #002FA7;
+            background: #e7f1ff;
+            box-shadow: 0 5px 15px rgba(0, 47, 167, 0.2);
+        }
+        .system-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #002FA7;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .system-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .system-params {
+            margin-top: 25px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #002FA7;
+            display: none;
+        }
+        .params-group {
+            display: none;
+        }
+        .params-group.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+       
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: #002FA7;
+            outline: none;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .calculation-method-block {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+        .radio-flex {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .radio-label:hover {
+            background: #f8f9fa;
+        }
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Настройка системы оценивания</h1>
+        </div>
+        
+        <div class="content">
+            
+            <form method="POST" id="gradingForm" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label>Выберите систему оценивания:</label>
+                    
+                    
+                    <div class="system-option" onclick="selectSystem('points')">
+                        <input type="radio" name="system_type" value="points" id="points" 
+                               {% if not grading_system or grading_system.system_type == 'points' %}checked{% endif %}>
+                        <label for="points" class="system-title">🎯 Балльная система</label>
+                        <div class="system-description">Классическая (2-5) или 10-балльная.</div>
+                    </div>
+                    
+                    
+                    <div class="system-option" onclick="selectSystem('percentage')">
+                        <input type="radio" name="system_type" value="percentage" id="percentage"
+                               {% if grading_system and grading_system.system_type == 'percentage' %}checked{% endif %}>
+                        <label for="percentage" class="system-title">📊 Процентная система</label>
+                        <div class="system-description">Оценки от 0 до 100%.</div>
+                    </div>
+                    
+                    
+                    <div class="system-option" onclick="selectSystem('letter')">
+                        <input type="radio" name="system_type" value="letter" id="letter"
+                               {% if grading_system and grading_system.system_type == 'letter' %}checked{% endif %}>
+                        <label for="letter" class="system-title">🔤 Буквенная система</label>
+                        <div class="system-description">Международная (A-F).</div>
+                    </div>
+                    
+                    
+                    <div class="system-option" onclick="selectSystem('custom')">
+                        <input type="radio" name="system_type" value="custom" id="custom"
+                               {% if grading_system and grading_system.system_type == 'custom' %}checked{% endif %}>
+                        <label for="custom" class="system-title">🎨 Кастомная (Смешанная)</label>
+                        <div class="system-description">Можно ставить и слова (Зачет), и цифры.</div>
+                    </div>
+                </div>
+
+                
+                <div class="calculation-method-block" id="calcMethodBlock">
+                    <label style="font-size: 18px; color: #333;">🧮 Метод расчета итога:</label>
+                    <div class="radio-flex">
+                        <label class="radio-label">
+                            <input type="radio" name="calculation_method" value="average" id="method_average" 
+                                   onchange="updatePassingLabel()"
+                                   {% if not grading_system or grading_system.calculation_method == 'average' %}checked{% endif %}>
+                            <span style="margin-left: 10px;">➗ Среднее арифметическое</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="calculation_method" value="sum" id="method_sum" 
+                                   onchange="updatePassingLabel()"
+                                   {% if grading_system and grading_system.calculation_method == 'sum' %}checked{% endif %}>
+                            <span style="margin-left: 10px;">➕ Сумма баллов</span>
+                        </label>
+                    </div>
+                </div>
+                
+                
+                <div id="systemParams" class="system-params">
+                    
+                   
+                    <div id="points-params" class="params-group">
+                        <div class="form-group">
+                            <label>Максимальный балл:</label>
+                           
+                            <input type="number" id="max_points" name="max_points" step="any" 
+                                   value="{{ grading_system.max_points if grading_system else 100 }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Минимальный балл (можно отрицательный):</label>
+                            <input type="number" id="min_points" name="min_points" step="any" 
+                                   value="{{ grading_system.min_points if grading_system else 0 }}">
+                        </div>
+                        <div class="form-group">
+                            <label id="passing_grade_label">Проходной балл (порог):</label>
+                            <input type="number" id="passing_grade" name="passing_grade" step="any" 
+                                   value="{{ grading_system.passing_grade if grading_system else 60 }}">
+                            <div id="passing_error" class="error-message"></div>
+                            <div id="passing_grade_help" class="help-text"></div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div id="percentage-params" class="params-group">
+                        <div class="form-group">
+                            <label>Проходной процент:</label>
+                            <input type="number" name="percentage_passing" step="any" 
+                                   value="{{ grading_system.passing_grade if grading_system else 60 }}">
+                        </div>
+                    </div>
+                    
+                    <div id="letter-params" class="params-group">
+                        <p>Используется стандартная шкала GPA (A=4.0, F=0).</p>
+                    </div>
+                    <div id="custom-params" class="params-group">
+                        <p style="color: #666;">Система автоматически определяет положительные и отрицательные оценки.</p>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">💾 Сохранить настройки</button>
+                    {% if assignment %}
+                    <a href="{{ url_for('teacher.group_management', subject_id=assignment.subject_id, group_id=assignment.group_id) }}" class="btn btn-secondary">↩️ Отмена</a>
+                    {% else %}
+                    <a href="/teacher_dashboard" class="btn btn-secondary">↩️ Отмена</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    let currentSystem = 'points';
+
+    function selectSystem(systemType) {
+        currentSystem = systemType;
+        document.querySelectorAll('.system-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        const selectedOption = document.querySelector(`input[value="${systemType}"]`).closest('.system-option');
+        if (selectedOption) selectedOption.classList.add('selected');
+        
+        const radioBtn = document.querySelector(`input[value="${systemType}"]`);
+        if(radioBtn) radioBtn.checked = true;
+        
+        updateSystemParams(systemType);
+    }
+
+    function updateSystemParams(systemType) {
+        const mainParams = document.getElementById('systemParams');
+        if(mainParams) mainParams.style.display = 'block';
+
+        document.querySelectorAll('.params-group').forEach(group => {
+            group.classList.remove('active');
+            group.style.display = 'none';
+        });
+        
+        const activeGroup = document.getElementById(systemType + '-params');
+        if (activeGroup) {
+            activeGroup.classList.add('active');
+            activeGroup.style.display = 'block';
+        }
+    }
+
+    function updatePassingLabel() {
+        const sumMethod = document.getElementById('method_sum');
+        if (!sumMethod) return; 
+
+        const isSum = sumMethod.checked;
+        const label = document.getElementById('passing_grade_label');
+        const help = document.getElementById('passing_grade_help');
+        
+        if (label && help) {
+            if (isSum) {
+                label.textContent = "Проходная СУММА баллов (Порог):";
+                help.textContent = "Например: 250.5. Если сумма ниже — итог красный.";
+            } else {
+                label.textContent = "Проходной СРЕДНИЙ балл (Порог):";
+                help.textContent = "Например: 2.5 или 3.75. Если среднее ниже — итог красный.";
+            }
+        }
+    }
+
+   
+    function validateForm() {
+        
+        if (currentSystem === 'points') {
+            const max = parseFloat(document.getElementById('max_points').value);
+            const min = parseFloat(document.getElementById('min_points').value);
+            const pass = parseFloat(document.getElementById('passing_grade').value);
+            const errorDiv = document.getElementById('passing_error');
+
+            
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
+            
+            if (!isNaN(pass) && !isNaN(max) && pass > max) {
+                errorDiv.textContent = `⚠️ Ошибка: Проходной балл (${pass}) не может быть больше Максимального (${max})!`;
+                errorDiv.style.display = 'block';
+                return false; 
+            }
+
+            
+            if (!isNaN(pass) && !isNaN(min) && pass < min) {
+                errorDiv.textContent = `⚠️ Ошибка: Проходной балл (${pass}) не может быть меньше Минимального (${min})!`;
+                errorDiv.style.display = 'block';
+                return false; 
+            }
+        }
+        return true; 
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const defaultSystem = document.querySelector('input[name="system_type"]:checked');
+        const sys = defaultSystem ? defaultSystem.value : 'points';
+        selectSystem(sys);
+        updatePassingLabel();
+    });
+</script>
+</body>
+</html>

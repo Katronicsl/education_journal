@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Подтверждение преподавателей</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f7fafd;
+            color: #304050;
+        }
+        header {
+            background: linear-gradient(90deg, #002FA7 60%, #3359D1 100%);
+            color: #fff;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            box-shadow: 0 3px 12px #002fa722;
+            position: relative;
+            z-index: 2;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: #e5eaf8;
+            opacity: 0.18;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            pointer-events: none;
+        }
+
+
+        .logo {
+            margin-left: 20px;
+        }
+
+        .logo-img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            background: #fff;
+            user-select: none;
+        }
+
+
+
+        nav {
+            display: flex;
+            gap: 8px;
+            margin-left: 18px;
+            margin-right: auto;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.22s, color 0.15s;
+        }
+
+        nav a:hover,
+        nav a:focus {
+            background: #EEA200;
+            color: #ffffff;
+        }
+
+
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 22px;
+        }
+
+        .username {
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            object-fit: cover;
+        }
+
+        .logout-btn {
+            background: #F55353;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            padding: 7px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.16s;
+        }
+        .logout-btn:hover {
+            background: #ff7676;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #fffdfa;
+            border-radius: 20px;
+            box-shadow: 0 2px 16px #e0eaff3a;
+            padding: 30px 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #002FA7;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .teachers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .teachers-table th {
+            background: #002FA7;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .teachers-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 15px;
+        }
+        .teachers-table tr:hover {
+            background-color: #f8f9ff;
+        }
+        .teachers-table tr:last-child td {
+            border-bottom: none;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-approve {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .btn-approve:hover {
+            background: #218838;
+        }
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .btn-reject:hover {
+            background: #c82333;
+        }
+        .no-teachers {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 18px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .user-menu-wrap {
+    position: relative;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 120%;
+    right: 0;
+    width: 220px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.dropdown-menu.show {
+    display: flex;
+}
+
+.btn-edit-profile {
+    display: block;
+    background: #343698;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-edit-profile:hover {
+    background: #EEA200;
+}
+
+.btn-logout {
+    display: block;
+    text-align: center;
+    color: #d32f2f;
+    text-decoration: none;
+    padding: 8px 0;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.btn-logout:hover {
+    background: #fff0f0;
+}
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img" />
+    </div>
+
+    <nav>
+        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+        <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+        <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+    </nav>
+
+<div class="header-right">
+    <div class="user-menu-wrap">
+        <div class="user-info" onclick="toggleUserMenu()">
+            <span class="username">
+                {{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}
+            </span>
+            <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}"
+                 alt="Avatar" class="avatar">
+        </div>
+
+        <div class="dropdown-menu" id="userDropdown">
+            <a href="{{ url_for('main.profile') }}" class="btn-edit-profile">
+                Редактировать профиль
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                Выйти
+            </a>
+        </div>
+    </div>
+</div>
+</header>
+
+    <div class="container">
+        <h1>Преподаватели, ожидающие подтверждения</h1>
+        
+        {% if teachers %}
+        <table class="teachers-table">
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Email</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td>{{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.middle_name }}</td>
+                    <td>{{ teacher.email }}</td>
+                    <td><span class="status-badge status-pending">Ожидает подтверждения</span></td>
+                    <td>
+                        <div class="action-buttons">
+                                <a href="{{ url_for('admin.pending_teachers') }}" class="btn-view" style="background:#E7F1FF;color:var(--blue);padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;margin-right:6px">Просмотр</a>
+                            <form method="post" action="{{ url_for('admin.approve_teacher', user_id=teacher.id) }}" style="display:inline;">
+                                <button type="submit" class="btn-approve">Подтвердить</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin.reject_teacher', user_id=teacher.id) }}" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите отклонить преподавателя?');">
+                                <button type="submit" class="btn-reject">Отклонить</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-teachers">
+            <p>Нет преподавателей, ожидающих подтверждения.</p>
+        </div>
+        {% endif %}
+    </div>
+
+<script>
+    function toggleUserMenu() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    window.addEventListener('click', function(event) {
+        if (!event.target.closest('.user-menu-wrap')) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('.teachers-table');
+        const noTeachers = document.querySelector('.no-teachers');
+
+        if (table) {
+            table.style.opacity = '0';
+            table.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                table.style.transition = 'all 0.4s ease';
+                table.style.opacity = '1';
+                table.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        if (noTeachers) {
+            noTeachers.style.opacity = '0';
+            setTimeout(() => {
+                noTeachers.style.transition = 'all 0.4s ease';
+                noTeachers.style.opacity = '1';
+            }, 100);
+        }
+
+        const approveForms = document.querySelectorAll('form[action*="approve_teacher"]');
+        approveForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Подтвердить преподавателя?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
