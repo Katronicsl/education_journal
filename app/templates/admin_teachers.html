@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Преподаватели (админ)</title>
+    <style>
+        :root{--blue:#002FA7;--muted:#666;--card:#fff;--bg:#f7fafd}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+
+        .container{max-width:1100px;margin:36px auto;background:transparent;padding:0 18px}
+
+        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722;position:relative;z-index:2}
+        header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#e5eaf8;opacity:0.18;border-bottom-left-radius:34px;border-bottom-right-radius:34px;pointer-events:none}
+        .logo{flex-shrink:0;margin-right:18px}
+        .logo-img{width:56px;height:56px;object-fit:cover;border-radius:50%;background:#fff;user-select:none}
+        nav{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+        nav a{color:#fff;text-decoration:none;font-size:17px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s;white-space:nowrap}
+        nav a:hover,nav a:focus{background:#EEA200;color:#ffffff}
+        .header-right{display:flex;align-items:center;gap:10px;margin-left:auto;margin-right:2px;flex-shrink:0}
+        .username{font-size:15px;color:#fff;white-space:nowrap}
+        .avatar{width:28px;height:28px;border-radius:50%;background:#fff;object-fit:cover}
+
+        h1{color:var(--blue);margin-top:24px;margin-bottom:18px}
+
+        .search-bar{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+        .search-bar input, .search-bar select{padding:12px 14px;border:1px solid #d1d9e6;border-radius:12px;font-size:15px}
+        .search-bar input{flex:1;min-width:220px}
+        .search-bar select{min-width:180px}
+
+        .message{padding:14px 18px;border-radius:14px;margin-bottom:16px}
+        .message.success{background:#eaf7f1;color:#0f6f47}
+        .message.error{background:#ffe6e6;color:#9b1b1b}
+
+        .table-wrapper{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e8f0ff}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:14px 16px;text-align:left;border-bottom:1px solid #eef4fb}
+        th{cursor:pointer;color:#002fa7;background:#f7fbff;font-weight:700;user-select:none}
+        th:hover{background:#eef4fb}
+        tr:hover{background:#f5f8ff}
+        .delete-button{padding:8px 12px;border:none;border-radius:10px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;font-size:14px;transition:background .2s}
+        .delete-button:hover{background:#a30000}
+
+        @media (max-width:900px){.container{padding:0 12px};.search-bar{flex-direction:column}.search-bar input,.search-bar select{width:100%}}
+    </style>
+</head>
+<body>
+<header>
+    <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img"/>
+    <nav>
+        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+        <a href="{{ url_for('admin.groups_list') }}">Группы</a>
+        <a href="{{ url_for('admin.student_rating_page') }}">Успеваемость</a>
+        <a href="{{ url_for('admin.structure_management') }}">Структура</a>
+        <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+    </nav>
+    <div class="header-right">
+        <span class="username">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
+        <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Аватар" class="avatar">
+    </div>
+</header>
+
+<div class="container">
+    <h1>Преподаватели</h1>
+    {% if message %}
+    <div class="message {{ 'error' if error else 'success' }}">{{ message }}</div>
+    {% endif %}
+    
+    <div class="search-bar">
+        <input id="teacherSearch" type="text" placeholder="Поиск по фамилии, имени, email...">
+        <select id="universityFilter">
+            <option value="">Все университеты</option>
+            {% for university in universities %}
+            <option value="{{ university.name.lower() }}">{{ university.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="teachers-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Фамилия</th>
+                    <th onclick="sortTable(1)">Имя</th>
+                    <th onclick="sortTable(2)">Email</th>
+                    <th onclick="sortTable(3)">Университет</th>
+                    <th style="width:110px">Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr class="teacher-row" data-search="{{ (teacher.last_name + ' ' + teacher.first_name + ' ' + teacher.email).lower() }}" data-university="{{ ((teacher.universities[0].name if teacher.universities else '') if teacher.universities else '').lower() }}">
+                    <td>{{ teacher.last_name }}</td>
+                    <td>{{ teacher.first_name }}</td>
+                    <td>{{ teacher.email }}</td>
+                    <td>{{ teacher.universities[0].name if teacher.universities else '—' }}</td>
+                    <td>
+                        <button class="delete-button" onclick="openDeleteModal({{ teacher.id }}, '{{ teacher.last_name }} {{ teacher.first_name }}')">Удалить</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align:center;color:#666">Нет зарегистрированных преподавателей.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Модалка удаления преподавателя -->
+<div id="deleteModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:16px;padding:32px;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,0.15)">
+        <h2 style="margin:0 0 16px 0;color:#d10000;font-size:24px">Удалить преподавателя?</h2>
+        <p id="modalText" style="margin:0 0 24px 0;color:#666;line-height:1.6"></p>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+            <button onclick="closeDeleteModal()" style="padding:10px 22px;border:1px solid #d1d9e6;border-radius:12px;background:#f7fbff;color:#002fa7;font-weight:700;cursor:pointer;transition:background .2s">Отмена</button>
+            <button onclick="submitDeleteTeacher()" style="padding:10px 22px;border:none;border-radius:12px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;transition:background .2s">Удалить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let sortDirection = {};
+let deleteTeacherId = null;
+
+function openDeleteModal(teacherId, teacherName) {
+    deleteTeacherId = teacherId;
+    document.getElementById('modalText').textContent = `Вы уверены, что хотите удалить преподавателя ${teacherName}?`;
+    document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    deleteTeacherId = null;
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+function submitDeleteTeacher() {
+    if (deleteTeacherId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/delete_teacher/${deleteTeacherId}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function sortTable(columnIndex) {
+    const table = document.getElementById('teachers-table');
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+    const ascending = sortDirection[columnIndex] !== true;
+    
+    rows.sort((a, b) => {
+        const aText = a.cells[columnIndex].innerText.trim().toLowerCase();
+        const bText = b.cells[columnIndex].innerText.trim().toLowerCase();
+        return aText.localeCompare(bText, 'ru', {numeric:true}) * (ascending ? 1 : -1);
+    });
+    
+    rows.forEach(row => tbody.appendChild(row));
+    sortDirection[columnIndex] = ascending;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('teacherSearch');
+    const universityFilter = document.getElementById('universityFilter');
+    const rows = document.querySelectorAll('.teacher-row');
+
+    function filterTable() {
+        const searchQuery = searchInput.value.trim().toLowerCase();
+        const universityQuery = universityFilter.value.trim().toLowerCase();
+        
+        rows.forEach(row => {
+            const searchText = row.dataset.search || '';
+            const universityText = row.dataset.university || '';
+            const matchesSearch = searchText.includes(searchQuery);
+            const matchesUniversity = universityQuery === '' || universityText.includes(universityQuery);
+            row.style.display = (matchesSearch && matchesUniversity) ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    universityFilter.addEventListener('change', filterTable);
+});
+</script>
+</body>
+</html>
+

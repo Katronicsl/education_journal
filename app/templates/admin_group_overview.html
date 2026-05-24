@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обзор группы (админ)</title>
+    <style>
+        :root{--blue:#002FA7;--muted:#666;--card:#fff;--bg:#f7fafd}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+        .container{max-width:1200px;margin:36px auto;padding:0 18px}
+        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722;position:relative;z-index:2}
+        nav{display:flex;gap:8px;flex-wrap:wrap}
+        nav a{color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s}
+        nav a:hover{background:#EEA200;color:#fff}
+        .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+        .header-right img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff}
+        .card{background:#fff;border-radius:18px;padding:24px;margin-top:24px;border:1px solid #e8eff7}
+        .card h1{margin-top:0;color:#002fa7}
+        table{width:100%;border-collapse:collapse;margin-top:20px}
+        th, td{padding:12px 14px;border:1px solid #e5eaf8;text-align:left}
+        th{background:#f1f5fb;color:#1a3d86}
+        tr:nth-child(even){background:#f9fbff}
+        .note{margin-top:14px;color:#444}
+        .back-link{display:inline-block;margin-bottom:18px;color:#002fa7;text-decoration:none;font-weight:700}
+    </style>
+</head>
+<body>
+<header>
+    <div><img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" style="width:56px;height:56px;border-radius:50%;background:#fff;"/></div>
+    <nav>
+        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+        <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+        <a href="{{ url_for('admin.structure_management') }}">Структура</a>
+        <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+    </nav>
+    <div class="header-right">
+        <span>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
+        <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Avatar">
+    </div>
+</header>
+<div class="container">
+    <a href="{{ url_for('admin.groups_list') }}" class="back-link">← Назад к списку групп</a>
+    <div class="card">
+        <h1>Группа {{ group.name }}</h1>
+        {% if subjects %}
+        <div class="note">Средние оценки по назначенным предметам представлены в балльной шкале.</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Студент</th>
+                    {% for subject in subjects %}
+                    <th>{{ subject.name }}</th>
+                    {% endfor %}
+                    <th>Итог</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    {% for subject in subjects %}
+                    <td>{{ row.subjects[subject.id] if row.subjects[subject.id] is not none else '-' }}</td>
+                    {% endfor %}
+                    <td>{{ row.overall if row.overall is not none else '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Для этой группы ещё не назначены предметы.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

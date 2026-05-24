@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление учебной структурой</title>
+    <style>
+        :root{--blue:#002FA7;--muted:#666;--card:#fff;--bg:#f7fafd}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+        .container{max-width:1100px;margin:36px auto;padding:0 18px}
+        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722}
+        nav{display:flex;gap:8px;flex-shrink:0}
+        nav a{color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s}
+        nav a:hover{background:#EEA200;color:#fff}
+        .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+        .header-right img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff}
+        .card{background:#fff;border-radius:18px;padding:24px;margin-top:24px;border:1px solid #e8eff7}
+        .card h2{margin-top:0;color:#002fa7}
+        .form-group{margin-bottom:18px}
+        .form-group label{display:block;margin-bottom:8px;font-weight:700}
+        .form-group input, .form-group select{width:100%;padding:12px;border:1px solid #d1d9e6;border-radius:12px;font-size:15px}
+        .button{display:inline-block;padding:12px 22px;border:none;border-radius:14px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer}
+        .button:hover{background:#001f7a}
+        .message{padding:14px 18px;border-radius:14px;margin-top:16px}
+        .message.success{background:#eaf7f1;color:#0f6f47}
+        .message.error{background:#ffe6e6;color:#9b1b1b}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .list-card{padding:18px;border:1px solid #e8eff7;border-radius:14px;background:#fff}
+        .list-card h3{margin:0 0 14px 0;color:#002fa7}
+        .simple-list{list-style:none;padding:0;margin:0}
+        .simple-list li{padding:8px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
+        .simple-list li:last-child{border-bottom:none}
+        .simple-list strong{display:inline-block;color:#334155}
+        .delete-btn{padding:8px 12px;border:none;border-radius:10px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;font-size:13px;transition:background .2s}
+        .delete-btn:hover{background:#a30000}
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" style="width:56px;height:56px;border-radius:50%;background:#fff;"/>
+    </div>
+    <nav>
+        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+        <a href="{{ url_for('admin.admin_teachers') }}">Преподаватели</a>
+        <a href="{{ url_for('admin.groups_list') }}">Группы</a>
+        <a href="{{ url_for('admin.student_rating_page') }}">Успеваемость</a>
+    </nav>
+    <div class="header-right">
+        <span>{{ user.last_name }} {{ user.first_name }}</span>
+        <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Avatar">
+    </div>
+</header>
+<div class="container">
+    <div class="card">
+        <h2>Управление учебной структурой</h2>
+        {% if message %}
+        <div class="message {{ 'error' if error else 'success' }}">{{ message }}</div>
+        {% endif %}
+        <div class="grid">
+            <div class="card">
+                <h3>Добавить университет</h3>
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_university">
+                    <div class="form-group">
+                        <label for="university_name">Название университета</label>
+                        <input id="university_name" name="university_name" type="text" required>
+                    </div>
+                    <button class="button" type="submit">Добавить</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Добавить курс</h3>
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_course">
+                    <div class="form-group">
+                        <label for="university_id">Университет</label>
+                        <select id="university_id" name="university_id" required>
+                            <option value="">-- Выберите университет --</option>
+                            {% for univ in universities %}
+                            <option value="{{ univ.id }}">{{ univ.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course_name">Название курса</label>
+                        <input id="course_name" name="course_name" type="text" required>
+                    </div>
+                    <button class="button" type="submit">Добавить</button>
+                </form>
+            </div>
+            <div class="card" style="grid-column: span 2;">
+                <h3>Добавить группу</h3>
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_group">
+                    <div class="form-group">
+                        <label for="course_id">Курс</label>
+                        <select id="course_id" name="course_id" required>
+                            <option value="">-- Выберите курс --</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.university.name }} — {{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_name">Название группы</label>
+                        <input id="group_name" name="group_name" type="text" required>
+                    </div>
+                    <button class="button" type="submit">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Университеты</h3>
+        <ul class="simple-list">
+            {% for university in universities %}
+            <li>
+                <div>
+                    <strong>{{ university.name }}</strong> {% if university.courses|length > 0 %}<span style="color:#999">({{ university.courses|length }} курс{% if university.courses|length > 1 %}а{% endif %})</span>{% endif %}
+                </div>
+                <button class="delete-btn" onclick="openUniversityDeleteModal('{{ university.id }}', '{{ university.name }}')">Удалить</button>
+            </li>
+            {% else %}
+            <li>Университеты не найдены.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Модалка удаления университета -->
+<div id="deleteUnivModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:16px;padding:32px;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,0.15)">
+        <h2 style="margin:0 0 16px 0;color:#d10000;font-size:24px">Удалить университет?</h2>
+        <p id="univModalText" style="margin:0 0 24px 0;color:#666;line-height:1.6"></p>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+            <button onclick="closeUniversityDeleteModal()" style="padding:10px 22px;border:1px solid #d1d9e6;border-radius:12px;background:#f7fbff;color:#002fa7;font-weight:700;cursor:pointer;transition:background .2s">Отмена</button>
+            <button onclick="submitUniversityDelete()" style="padding:10px 22px;border:none;border-radius:12px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;transition:background .2s">Удалить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let deleteUnivId = null;
+
+function openUniversityDeleteModal(univId, univName) {
+    deleteUnivId = univId;
+    document.getElementById('univModalText').textContent = `Вы уверены, что хотите удалить университет "${univName}"? Сначала удалите все курсы этого университета.`;
+    document.getElementById('deleteUnivModal').style.display = 'flex';
+}
+
+function closeUniversityDeleteModal() {
+    deleteUnivId = null;
+    document.getElementById('deleteUnivModal').style.display = 'none';
+}
+
+function submitUniversityDelete() {
+    if (deleteUnivId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/delete_university/${deleteUnivId}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>

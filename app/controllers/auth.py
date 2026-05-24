@@ -161,3 +161,20 @@ def logout():
     response.delete_cookie('refresh_token_cookie', path='/')
     response.delete_cookie('csrf_access_token', path='/')
     return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
