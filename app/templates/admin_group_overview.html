@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -23,17 +23,33 @@
         tr:nth-child(even){background:#f9fbff}
         .note{margin-top:14px;color:#444}
         .back-link{display:inline-block;margin-bottom:18px;color:#002fa7;text-decoration:none;font-weight:700}
+        .message{padding:14px 18px;border-radius:14px;margin-bottom:16px}
+        .message.success{background:#eaf7f1;color:#0f6f47}
+        .message.error{background:#ffe6e6;color:#9b1b1b}
+        .student-tools{display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px}
+        .student-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px;border:1px solid #eef4fb;border-radius:12px;background:#fff}
+        .student-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        select{padding:9px 10px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;background:#fff}
+        .btn{padding:9px 12px;border:none;border-radius:10px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer;text-decoration:none;font-size:14px}
+        .danger{background:#d10000}
     </style>
 </head>
 <body>
 <header>
     <div><img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" style="width:56px;height:56px;border-radius:50%;background:#fff;"/></div>
     <nav>
-        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
-        <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
-        <a href="{{ url_for('admin.structure_management') }}">Структура</a>
-        <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
-    </nav>
+    <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателя</a>
+    <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+    <details class="nav-dropdown" style="position:relative;display:inline-block">
+        <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
+        <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
+            <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
+            <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
+            <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
+        </div>
+    </details>
+    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+</nav>
     <div class="header-right">
         <span>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
         <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Avatar">
@@ -41,6 +57,9 @@
 </header>
 <div class="container">
     <a href="{{ url_for('admin.groups_list') }}" class="back-link">← Назад к списку групп</a>
+    {% if message %}
+    <div class="message {{ 'error' if error else 'success' }}">{{ message }}</div>
+    {% endif %}
     <div class="card">
         <h1>Группа {{ group.name }}</h1>
         {% if subjects %}
@@ -70,6 +89,43 @@
         {% else %}
         <p>Для этой группы ещё не назначены предметы.</p>
         {% endif %}
+    </div>
+    <div class="card">
+        <h1>Студенты группы</h1>
+        <form method="POST" action="{{ url_for('admin.add_student_to_group', group_id=group.id) }}" class="student-actions" style="margin-bottom:18px">
+            <select name="student_id" required>
+                <option value="">Добавить студента в эту группу</option>
+                {% for student in available_students %}
+                <option value="{{ student.id }}">{{ student.last_name }} {{ student.first_name }}{% if student.group %} — сейчас: {{ student.group.name }}{% else %} — без группы{% endif %}</option>
+                {% endfor %}
+            </select>
+            <button class="btn" type="submit">Добавить</button>
+        </form>
+        <div class="student-tools">
+            {% for student in students %}
+            <div class="student-row">
+                <strong>{{ student.last_name }} {{ student.first_name }} {{ student.middle_name or '' }}</strong>
+                <div class="student-actions">
+                    <form method="POST" action="{{ url_for('admin.move_student', group_id=group.id, student_id=student.id) }}" class="student-actions">
+                        <select name="group_id" required>
+                            <option value="">Перевести в группу</option>
+                            {% for target_group in all_groups %}
+                            {% if target_group.id != group.id %}
+                            <option value="{{ target_group.id }}">{{ target_group.course.university.name }} — {{ target_group.course.name }} — {{ target_group.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button class="btn" type="submit">Перевести</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.remove_student_from_group', group_id=group.id, student_id=student.id) }}" onsubmit="return confirm('Удалить студента из группы?')">
+                        <button class="btn danger" type="submit">Удалить из группы</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p>В этой группе пока нет студентов.</p>
+            {% endfor %}
+        </div>
     </div>
 </div>
 </body>

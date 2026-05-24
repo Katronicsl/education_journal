@@ -293,6 +293,81 @@ def structure_management():
     return render_template('admin_structure.html', user=user, universities=universities, courses=courses, message=message, error=error)
 
 
+@admin_bp.route('/universities')
+@role_required('admin')
+def universities_management():
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+    universities = University.query.order_by(University.name).all()
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
+    user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
+    return render_template('admin_universities.html', user=user, universities=universities, message=message, error=error)
+
+
+@admin_bp.route('/university/<int:university_id>/edit')
+@role_required('admin')
+def edit_university_page(university_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+    university = University.query.get_or_404(university_id)
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
+    user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
+    return render_template('admin_university_edit.html', user=user, university=university, message=message, error=error)
+
+
+@admin_bp.route('/course/<int:course_id>/edit')
+@role_required('admin')
+def edit_course_page(course_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+    course = Course.query.get_or_404(course_id)
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
+    user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
+    return render_template('admin_course_edit.html', user=user, course=course, message=message, error=error)
+
+
+@admin_bp.route('/group/<int:group_id>/edit')
+@role_required('admin')
+def edit_group_page(group_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+    group = StudentGroup.query.get_or_404(group_id)
+    students = User.query.filter_by(group_id=group.id, role='student').order_by(User.last_name, User.first_name).all()
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
+    user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
+    return render_template('admin_group_edit.html', user=user, group=group, students=students, message=message, error=error)
+
+
+@admin_bp.route('/student/<int:student_id>/edit')
+@role_required('admin')
+def edit_student_page(student_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student':
+        return redirect(url_for('admin.groups_list'))
+    universities = University.query.order_by(University.name).all()
+    courses = Course.query.order_by(Course.name).all()
+    groups = StudentGroup.query.order_by(StudentGroup.name).all()
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
+    user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
+    return render_template(
+        'admin_student_edit.html',
+        user=user,
+        student=student,
+        universities=universities,
+        courses=courses,
+        groups=groups,
+        message=message,
+        error=error
+    )
+
+
 @admin_bp.route('/delete_university/<int:university_id>', methods=['POST'])
 @role_required('admin')
 def delete_university(university_id):
@@ -302,6 +377,156 @@ def delete_university(university_id):
     db.session.delete(university)
     db.session.commit()
     return redirect(url_for('admin.structure_management', message='Университет удалён.', error=0))
+
+
+@admin_bp.route('/edit_university/<int:university_id>', methods=['POST'])
+@role_required('admin')
+def edit_university(university_id):
+    university = University.query.get_or_404(university_id)
+    new_name = request.form.get('name', '').strip()
+    if not new_name:
+        return redirect(url_for('admin.edit_university_page', university_id=university.id, message='Введите название университета.', error=1))
+    existing = University.query.filter(University.name == new_name, University.id != university.id).first()
+    if existing:
+        return redirect(url_for('admin.edit_university_page', university_id=university.id, message='Университет с таким названием уже существует.', error=1))
+    university.name = new_name
+    db.session.commit()
+    return redirect(url_for('admin.edit_university_page', university_id=university.id, message='Название университета обновлено.', error=0))
+
+
+@admin_bp.route('/edit_course/<int:course_id>', methods=['POST'])
+@role_required('admin')
+def edit_course(course_id):
+    course = Course.query.get_or_404(course_id)
+    new_name = normalize_course_name(request.form.get('name', ''))
+    if not new_name:
+        return redirect(url_for('admin.edit_course_page', course_id=course.id, message='Введите название курса.', error=1))
+    existing = Course.query.filter(
+        Course.name == new_name,
+        Course.university_id == course.university_id,
+        Course.id != course.id
+    ).first()
+    if existing:
+        return redirect(url_for('admin.edit_course_page', course_id=course.id, message='Курс с таким названием уже есть в этом университете.', error=1))
+    course.name = new_name
+    db.session.commit()
+    return redirect(url_for('admin.edit_course_page', course_id=course.id, message='Курс обновлен.', error=0))
+
+
+@admin_bp.route('/delete_course/<int:course_id>', methods=['POST'])
+@role_required('admin')
+def delete_course(course_id):
+    course = Course.query.get_or_404(course_id)
+    university_id = course.university_id
+    if course.groups:
+        return redirect(url_for('admin.edit_university_page', university_id=university_id, message='Сначала удалите все группы этого курса.', error=1))
+    db.session.delete(course)
+    db.session.commit()
+    return redirect(url_for('admin.edit_university_page', university_id=university_id, message='Курс удален.', error=0))
+
+
+@admin_bp.route('/edit_group/<int:group_id>', methods=['POST'])
+@role_required('admin')
+def edit_group(group_id):
+    group = StudentGroup.query.get_or_404(group_id)
+    new_name = request.form.get('name', '').strip()
+    if not new_name:
+        return redirect(url_for('admin.edit_group_page', group_id=group.id, message='Введите название группы.', error=1))
+    existing = StudentGroup.query.filter(
+        StudentGroup.name == new_name,
+        StudentGroup.course_id == group.course_id,
+        StudentGroup.id != group.id
+    ).first()
+    if existing:
+        return redirect(url_for('admin.edit_group_page', group_id=group.id, message='Группа с таким названием уже есть на этом курсе.', error=1))
+    group.name = new_name
+    db.session.commit()
+    return redirect(url_for('admin.edit_group_page', group_id=group.id, message='Группа обновлена.', error=0))
+
+
+@admin_bp.route('/student/<int:student_id>/edit', methods=['POST'])
+@role_required('admin')
+def edit_student(student_id):
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student':
+        return redirect(url_for('admin.groups_list'))
+
+    last_name = request.form.get('last_name', '').strip()
+    first_name = request.form.get('first_name', '').strip()
+    middle_name = request.form.get('middle_name', '').strip()
+    email = request.form.get('email', '').lower().strip()
+    university_id = request.form.get('university_id')
+    course_id = request.form.get('course_id')
+    group_id = request.form.get('group_id')
+
+    if not all([last_name, first_name, email]):
+        return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Заполните фамилию, имя и email.', error=1))
+
+    existing = User.query.filter(User.email == email, User.id != student.id).first()
+    if existing:
+        return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Пользователь с таким email уже существует.', error=1))
+
+    student.last_name = last_name
+    student.first_name = first_name
+    student.middle_name = middle_name
+    student.email = email
+
+    if (university_id or course_id) and not group_id:
+        return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Выберите группу или оставьте все поля обучения пустыми.', error=1))
+
+    if group_id:
+        group = StudentGroup.query.get(group_id)
+        if not group:
+            return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Выбранная группа не найдена.', error=1))
+        if course_id and str(group.course_id) != str(course_id):
+            return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Выбранная группа не относится к выбранному курсу.', error=1))
+        if university_id and str(group.course.university_id) != str(university_id):
+            return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Выбранная группа не относится к выбранному университету.', error=1))
+        student.group = group
+        student.course = group.course
+        student.university = group.course.university
+    else:
+        student.group = None
+        student.course = None
+        student.university = None
+
+    db.session.commit()
+    return redirect(url_for('admin.edit_student_page', student_id=student.id, message='Данные студента обновлены.', error=0))
+
+
+@admin_bp.route('/delete_group/<int:group_id>', methods=['POST'])
+@role_required('admin')
+def delete_group(group_id):
+    group = StudentGroup.query.get_or_404(group_id)
+    course_id = group.course_id
+    if group.students:
+        return redirect(url_for('admin.edit_course_page', course_id=course_id, message='Сначала переведите или удалите студентов из группы.', error=1))
+    if group.subject_assignments:
+        return redirect(url_for('admin.edit_course_page', course_id=course_id, message='Сначала удалите назначенные предметы у группы.', error=1))
+    db.session.delete(group)
+    db.session.commit()
+    return redirect(url_for('admin.edit_course_page', course_id=course_id, message='Группа удалена.', error=0))
+
+
+@admin_bp.route('/delete_student/<int:student_id>', methods=['POST'])
+@role_required('admin')
+def delete_student(student_id):
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student':
+        return redirect(url_for('admin.groups_list'))
+
+    group_id = student.group_id
+    if student.grades or student.attendance:
+        if group_id:
+            return redirect(url_for('admin.edit_group_page', group_id=group_id, message='У студента есть оценки или посещаемость. Сначала удалите связанные данные.', error=1))
+        return redirect(url_for('admin.groups_list'))
+
+    db.session.delete(student)
+    db.session.commit()
+
+    if group_id:
+        return redirect(url_for('admin.edit_group_page', group_id=group_id, message='Студент удален.', error=0))
+    return redirect(url_for('admin.groups_list'))
 
 
 @admin_bp.route('/teachers')
@@ -328,6 +553,23 @@ def delete_teacher(user_id):
     db.session.delete(teacher)
     db.session.commit()
     return redirect(url_for('admin.admin_teachers', message='Преподаватель удалён.', error=0))
+
+
+@admin_bp.route('/teacher/<int:user_id>/universities', methods=['POST'])
+@role_required('admin')
+def update_teacher_universities(user_id):
+    teacher = User.query.get_or_404(user_id)
+    if teacher.role != 'teacher':
+        return redirect(url_for('admin.admin_teachers', message='Невозможно изменить университеты этого пользователя.', error=1))
+    university_ids = request.form.getlist('universities')
+    if not university_ids:
+        return redirect(url_for('admin.admin_teachers', message='Выберите хотя бы один университет для преподавателя.', error=1))
+    universities = University.query.filter(University.id.in_(university_ids)).all()
+    if not universities:
+        return redirect(url_for('admin.admin_teachers', message='Выбранные университеты не найдены.', error=1))
+    teacher.universities = universities
+    db.session.commit()
+    return redirect(url_for('admin.admin_teachers', message='Университеты преподавателя обновлены.', error=0))
 
 
 @admin_bp.route('/group/<int:group_id>/assign_subject', methods=['GET', 'POST'])
@@ -432,8 +674,14 @@ def group_overview(group_id):
     subject_ids = list({a.subject_id for a in assignments})
     subjects = Subject.query.filter(Subject.id.in_(subject_ids)).all() if subject_ids else []
 
-  
     students = User.query.filter_by(group_id=group_id, role='student').order_by(User.last_name, User.first_name).all()
+    all_groups = StudentGroup.query.order_by(StudentGroup.name).all()
+    available_students = User.query.filter(
+        User.role == 'student',
+        db.or_(User.group_id != group_id, User.group_id.is_(None))
+    ).order_by(User.last_name, User.first_name).all()
+    message = request.args.get('message', '')
+    error = request.args.get('error', '0') == '1'
 
     subj_map = {s.id: s.name for s in subjects}
     data = []
@@ -481,7 +729,63 @@ def group_overview(group_id):
     # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
-    return render_template('admin_group_overview.html', user=user, group=group, subjects=subjects, data=data)
+    return render_template(
+        'admin_group_overview.html',
+        user=user,
+        group=group,
+        subjects=subjects,
+        data=data,
+        students=students,
+        all_groups=all_groups,
+        available_students=available_students,
+        message=message,
+        error=error
+    )
+
+
+@admin_bp.route('/group/<int:group_id>/student/<int:student_id>/move', methods=['POST'])
+@role_required('admin')
+def move_student(group_id, student_id):
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student':
+        return redirect(url_for('admin.group_overview', group_id=group_id, message='Можно переносить только студентов.', error=1))
+    new_group_id = request.form.get('group_id')
+    new_group = StudentGroup.query.get(new_group_id)
+    if not new_group:
+        return redirect(url_for('admin.group_overview', group_id=group_id, message='Выберите группу для перевода.', error=1))
+    student.group = new_group
+    student.course = new_group.course
+    student.university = new_group.course.university
+    db.session.commit()
+    return redirect(url_for('admin.group_overview', group_id=group_id, message='Студент переведен в другую группу.', error=0))
+
+
+@admin_bp.route('/group/<int:group_id>/student/<int:student_id>/remove', methods=['POST'])
+@role_required('admin')
+def remove_student_from_group(group_id, student_id):
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student' or student.group_id != group_id:
+        return redirect(url_for('admin.group_overview', group_id=group_id, message='Студент не найден в этой группе.', error=1))
+    student.group = None
+    student.course = None
+    student.university = None
+    db.session.commit()
+    return redirect(url_for('admin.group_overview', group_id=group_id, message='Студент удален из группы.', error=0))
+
+
+@admin_bp.route('/group/<int:group_id>/student/add', methods=['POST'])
+@role_required('admin')
+def add_student_to_group(group_id):
+    group = StudentGroup.query.get_or_404(group_id)
+    student_id = request.form.get('student_id')
+    student = User.query.filter_by(id=student_id, role='student').first()
+    if not student:
+        return redirect(url_for('admin.group_overview', group_id=group_id, message='Выберите студента.', error=1))
+    student.group = group
+    student.course = group.course
+    student.university = group.course.university
+    db.session.commit()
+    return redirect(url_for('admin.group_overview', group_id=group_id, message='Студент добавлен в группу.', error=0))
 
 @admin_bp.route('/group/<int:group_id>/subject/<int:subject_id>')
 @jwt_required(locations=["cookies"])

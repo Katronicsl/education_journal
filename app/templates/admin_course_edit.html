@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование курса</title>
+    <style>
+        :root{--blue:#002FA7;--bg:#f7fafd}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+        .container{max-width:1000px;margin:36px auto;padding:0 18px}
+        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722}
+        nav{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+        nav a{color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s}
+        nav a:hover{background:#EEA200;color:#fff}
+        .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+        .header-right img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff}
+        .card{background:#fff;border-radius:18px;padding:24px;margin-top:24px;border:1px solid #e8eff7}
+        h1,h2{color:var(--blue);margin-top:0}
+        .back-link{display:inline-block;margin-bottom:18px;color:#002fa7;text-decoration:none;font-weight:700}
+        .message{padding:14px 18px;border-radius:14px;margin-bottom:16px}
+        .message.success{background:#eaf7f1;color:#0f6f47}
+        .message.error{background:#ffe6e6;color:#9b1b1b}
+        .form-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+        input{padding:12px;border:1px solid #d1d9e6;border-radius:12px;font-size:15px;min-width:280px;flex:1}
+        .button{display:inline-block;padding:12px 22px;border:none;border-radius:14px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer;text-decoration:none}
+        .small-button{display:inline-block;padding:9px 12px;border:none;border-radius:10px;background:#E7F1FF;color:#002fa7;font-weight:700;cursor:pointer;text-decoration:none;font-size:14px}
+        .delete-button{display:inline-block;padding:9px 12px;border:none;border-radius:10px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;text-decoration:none;font-size:14px}
+        .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        .groups{list-style:none;margin:0;padding:0}
+        .groups li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eef4fb}
+        .groups li:last-child{border-bottom:none}
+        .muted{color:#64748b}
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" style="width:56px;height:56px;border-radius:50%;background:#fff;"/>
+    </div>
+    <nav>
+    <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателя</a>
+    <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+    <details class="nav-dropdown" style="position:relative;display:inline-block">
+        <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
+        <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
+            <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
+            <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
+            <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
+        </div>
+    </details>
+    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+</nav>
+    <div class="header-right">
+        <span>{{ user.last_name }} {{ user.first_name }}</span>
+        <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Avatar">
+    </div>
+</header>
+
+<div class="container">
+    <a href="{{ url_for('admin.edit_university_page', university_id=course.university.id) }}" class="back-link">← Назад к университету</a>
+
+    <div class="card">
+        <h1>Редактирование курса</h1>
+        <div class="muted" style="margin-bottom:16px">{{ course.university.name }}</div>
+        {% if message %}
+        <div class="message {{ 'error' if error else 'success' }}">{{ message }}</div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('admin.edit_course', course_id=course.id) }}" class="form-row">
+            <input name="name" value="{{ course.name }}" required>
+            <button class="button" type="submit">Сохранить</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Группы курса</h2>
+        <ul class="groups">
+            {% for group in course.groups %}
+            <li>
+                <div>
+                    <strong>{{ group.name }}</strong>
+                    <div class="muted">{{ course.university.name }} — {{ course.name }}</div>
+                </div>
+                <div class="actions">
+                    <a class="small-button" href="{{ url_for('admin.edit_group_page', group_id=group.id) }}">Редактировать</a>
+                    <form method="POST" action="{{ url_for('admin.delete_group', group_id=group.id) }}" onsubmit="return confirm('Удалить группу?')" style="margin:0">
+                        <button class="delete-button" type="submit">Удалить</button>
+                    </form>
+                </div>
+            </li>
+            {% else %}
+            <li class="muted">Группы не найдены.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+</body>
+</html>

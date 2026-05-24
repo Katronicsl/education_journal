@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -13,6 +13,9 @@
         .header { background: linear-gradient(90deg, #002FA7 60%, #3359D1 100%); color: white; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; }
         .header-info h1 { font-size: 28px; margin-bottom: 8px; }
         .header-info .subtitle { font-size: 16px; opacity: 0.9; }
+        .admin-nav { background: #002FA7; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 0 40px 16px; }
+        .admin-nav a { color: #fff; text-decoration: none; font-size: 18px; padding: 6px 10px; border-radius: 10px; white-space: nowrap; }
+        .admin-nav a:hover { background: #EEA200; color: #fff; }
         .user-section { display: flex; align-items: center; gap: 20px; }
         .btn-back {
             width: 38px;
@@ -95,6 +98,19 @@
                 <a href="{{ url_for('admin.subject_groups', subject_id=subject.id) }}" class="btn-back">←</a>
             </div>
         </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателя</a>
+            <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+            <details class="nav-dropdown" style="position:relative;display:inline-block">
+                <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
+                <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
+                    <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
+                    <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
+                    <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
+                </div>
+            </details>
+            <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+        </nav>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('grades')">📊 Успеваемость</button>

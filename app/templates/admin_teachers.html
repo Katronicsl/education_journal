@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -39,6 +39,13 @@
         th{cursor:pointer;color:#002fa7;background:#f7fbff;font-weight:700;user-select:none}
         th:hover{background:#eef4fb}
         tr:hover{background:#f5f8ff}
+        .teacher-universities{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+        .teacher-picker{min-width:240px;max-width:340px;padding:8px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;background:#fff}
+        .university-editor{display:flex;flex-direction:column;gap:10px;min-width:280px}
+        .university-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        .university-tag{display:inline-flex;gap:6px;align-items:center;padding:7px 9px;border-radius:10px;background:#E7F1FF;color:#002fa7;font-weight:700;font-size:13px}
+        .tag-remove{border:none;background:transparent;color:#d10000;cursor:pointer;font-size:18px;font-weight:800;line-height:1;padding:0 2px}
+        .save-button{padding:8px 12px;border:none;border-radius:10px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer;font-size:14px}
         .delete-button{padding:8px 12px;border:none;border-radius:10px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;font-size:14px;transition:background .2s}
         .delete-button:hover{background:#a30000}
 
@@ -49,12 +56,18 @@
 <header>
     <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img"/>
     <nav>
-        <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
-        <a href="{{ url_for('admin.groups_list') }}">Группы</a>
-        <a href="{{ url_for('admin.student_rating_page') }}">Успеваемость</a>
-        <a href="{{ url_for('admin.structure_management') }}">Структура</a>
-        <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
-    </nav>
+    <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателя</a>
+    <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+    <details class="nav-dropdown" style="position:relative;display:inline-block">
+        <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
+        <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
+            <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
+            <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
+            <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
+        </div>
+    </details>
+    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+</nav>
     <div class="header-right">
         <span class="username">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
         <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Аватар" class="avatar">
@@ -84,17 +97,38 @@
                     <th onclick="sortTable(0)">Фамилия</th>
                     <th onclick="sortTable(1)">Имя</th>
                     <th onclick="sortTable(2)">Email</th>
-                    <th onclick="sortTable(3)">Университет</th>
-                    <th style="width:110px">Действие</th>
+                    <th onclick="sortTable(3)">Университеты</th>
+                    <th style="width:220px">Действие</th>
                 </tr>
             </thead>
             <tbody>
                 {% for teacher in teachers %}
-                <tr class="teacher-row" data-search="{{ (teacher.last_name + ' ' + teacher.first_name + ' ' + teacher.email).lower() }}" data-university="{{ ((teacher.universities[0].name if teacher.universities else '') if teacher.universities else '').lower() }}">
+                <tr class="teacher-row" data-search="{{ (teacher.last_name + ' ' + teacher.first_name + ' ' + teacher.email).lower() }}" data-university="{{ teacher.universities|map(attribute='name')|join(' ')|lower }}">
                     <td>{{ teacher.last_name }}</td>
                     <td>{{ teacher.first_name }}</td>
                     <td>{{ teacher.email }}</td>
-                    <td>{{ teacher.universities[0].name if teacher.universities else '—' }}</td>
+                    <td>
+                        <form class="teacher-universities teacher-university-form" method="POST" action="{{ url_for('admin.update_teacher_universities', user_id=teacher.id) }}">
+                            <div class="university-editor">
+                                <select class="teacher-picker" aria-label="Добавить университет">
+                                    <option value="">Добавить университет</option>
+                                    {% for university in universities %}
+                                    <option value="{{ university.id }}" data-name="{{ university.name }}" {% if university in teacher.universities %}disabled{% endif %}>{{ university.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="university-tags">
+                                    {% for university in teacher.universities %}
+                                    <span class="university-tag" data-id="{{ university.id }}">
+                                        {{ university.name }}
+                                        <button class="tag-remove" type="button" aria-label="Удалить {{ university.name }}">×</button>
+                                        <input type="hidden" name="universities" value="{{ university.id }}">
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <button class="save-button" type="submit">Сохранить</button>
+                        </form>
+                    </td>
                     <td>
                         <button class="delete-button" onclick="openDeleteModal({{ teacher.id }}, '{{ teacher.last_name }} {{ teacher.first_name }}')">Удалить</button>
                     </td>
@@ -182,6 +216,74 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', filterTable);
     universityFilter.addEventListener('change', filterTable);
+
+    document.querySelectorAll('.teacher-university-form').forEach(form => {
+        const picker = form.querySelector('.teacher-picker');
+        const tags = form.querySelector('.university-tags');
+
+        function selectedIds() {
+            return Array.from(tags.querySelectorAll('.university-tag')).map(tag => tag.dataset.id);
+        }
+
+        function refreshPicker() {
+            const ids = selectedIds();
+            Array.from(picker.options).forEach(option => {
+                if (!option.value) {
+                    return;
+                }
+                option.disabled = ids.includes(option.value);
+            });
+            picker.value = '';
+        }
+
+        function addTag(id, name) {
+            if (!id || selectedIds().includes(id)) {
+                return;
+            }
+            const tag = document.createElement('span');
+            tag.className = 'university-tag';
+            tag.dataset.id = id;
+            tag.append(document.createTextNode(name + ' '));
+
+            const removeButton = document.createElement('button');
+            removeButton.className = 'tag-remove';
+            removeButton.type = 'button';
+            removeButton.setAttribute('aria-label', 'Удалить ' + name);
+            removeButton.textContent = '×';
+
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'universities';
+            hidden.value = id;
+
+            tag.append(removeButton, hidden);
+            tags.appendChild(tag);
+            refreshPicker();
+        }
+
+        picker.addEventListener('change', function() {
+            const option = picker.selectedOptions[0];
+            if (option && option.value) {
+                addTag(option.value, option.dataset.name || option.textContent.trim());
+            }
+        });
+
+        tags.addEventListener('click', function(event) {
+            if (event.target.classList.contains('tag-remove')) {
+                event.target.closest('.university-tag').remove();
+                refreshPicker();
+            }
+        });
+
+        form.addEventListener('submit', function(event) {
+            if (!tags.querySelector('input[name="universities"]')) {
+                event.preventDefault();
+                alert('Выберите хотя бы один университет.');
+            }
+        });
+
+        refreshPicker();
+    });
 });
 </script>
 </body>
