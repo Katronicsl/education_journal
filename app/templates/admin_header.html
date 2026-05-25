@@ -1,0 +1,59 @@
+<header class="admin-site-header">
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img" />
+    </div>
+
+    <nav>
+    <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
+    <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+    <details class="nav-dropdown" style="position:relative;display:inline-block">
+        <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
+        <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
+            <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
+            <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
+            <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
+        </div>
+    </details>
+    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
+</nav>
+
+<div class="header-right">
+    <div class="user-menu-wrap">
+        <div class="user-info" onclick="toggleUserMenu()">
+            <span class="username">
+                {{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}
+            </span>
+            <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}"
+                 alt="Avatar" class="avatar">
+        </div>
+
+        <div class="dropdown-menu" id="userDropdown">
+            <a href="{{ url_for('main.profile') }}" class="btn-edit-profile">
+                Редактировать профиль
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                Выйти
+            </a>
+        </div>
+    </div>
+</div>
+</header>
+
+<script>
+    function toggleUserMenu() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    window.addEventListener('click', function(event) {
+        if (!event.target.closest('.user-menu-wrap')) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
+</script>

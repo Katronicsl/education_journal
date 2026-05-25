@@ -280,6 +280,51 @@
     border: 2px solid rgb(0, 0, 0);
     color: rgb(0, 0, 0);
   }
+  .nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-dropdown summary {
+    list-style: none;
+    cursor: pointer;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+    transition: 0.22s;
+}
+
+.nav-dropdown summary:hover {
+    background: #EEA200;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 190px;
+    background: #fff;
+    border: 1px solid #e8eff7;
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.14);
+    padding: 8px;
+    z-index: 20;
+}
+
+.nav-dropdown-menu a {
+    display: block;
+    color: #002fa7;
+    padding: 9px 10px;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.nav-dropdown-menu a:hover {
+    background: #f0f4ff;
+}
 </style>
 </head>
 <body>
@@ -290,8 +335,38 @@
       <a href="{{ url_for('student.dashboard') }}">Главная</a>
       <a href="{{ url_for('student.rating') }}">Рейтинг</a>
     {% elif user.role == 'admin' %}
-      <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателей</a>
-      <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
+
+    <a href="{{ url_for('admin.pending_teachers') }}">
+        Подтверждение преподавателей
+    </a>
+
+    <a href="{{ url_for('admin.student_rating_page') }}">
+        Рейтинг
+    </a>
+
+    <details class="nav-dropdown">
+
+        <summary>
+            Структура
+        </summary>
+
+        <div class="nav-dropdown-menu">
+
+            <a href="{{ url_for('admin.structure_management') }}">
+                Структура
+            </a>
+
+            <a href="{{ url_for('admin.admin_teachers') }}">
+                Преподаватели
+            </a>
+
+            <a href="{{ url_for('admin.groups_list') }}">
+                Группы
+            </a>
+
+        </div>
+
+    </details>
     {% else %}
       <a href="{{ url_for('teacher.dashboard') }}">Главная</a>
       <a href="{{ url_for('teacher.student_rating_page') }}">Рейтинг</a>

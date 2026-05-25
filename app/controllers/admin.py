@@ -1,18 +1,67 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import db
 from app.models.user import User
 from app.utils.decorators import role_required
-from app.utils.helpers import init_universities
+from app.utils.helpers import init_universities, format_excel_width
 from app.models.course import University, Course, StudentGroup
 from app.models.subject import TeacherSubjectGroup, Subject, GradingSystem
 from app.models.lesson import Lesson, Grade, Attendance
 from app.utils.helpers import get_passing_grade
 from flask import abort
+from io import BytesIO
+from datetime import datetime
+import pandas as pd
 import re
 from app.models import db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+
+def build_group_overview_data(group_id):
+    group = StudentGroup.query.get_or_404(group_id)
+    assignments = TeacherSubjectGroup.query.filter_by(group_id=group_id).all()
+    subject_ids = list({a.subject_id for a in assignments})
+    subjects = Subject.query.filter(Subject.id.in_(subject_ids)).all() if subject_ids else []
+    students = User.query.filter_by(group_id=group_id, role='student').order_by(User.last_name, User.first_name).all()
+    data = []
+
+    for student in students:
+        row = {
+            'student_id': student.id,
+            'name': f"{student.last_name} {student.first_name}",
+            'subjects': {},
+            'overall': None
+        }
+        totals = []
+
+        for subj in subjects:
+            raw = db.session.query(Grade.value, GradingSystem.max_points) \
+                .join(TeacherSubjectGroup, Grade.teacher_subject_group_id == TeacherSubjectGroup.id) \
+                .outerjoin(GradingSystem, GradingSystem.teacher_subject_group_id == TeacherSubjectGroup.id) \
+                .filter(Grade.student_id == student.id) \
+                .filter(TeacherSubjectGroup.subject_id == subj.id) \
+                .all()
+
+            vals = []
+            for val, max_p in raw:
+                if val is None:
+                    continue
+                current_max = max_p if max_p else (5.0 if (val <= 5.0 and val > 0) else 100.0)
+                if current_max <= 0:
+                    current_max = 100
+                vals.append((val / current_max) * 5.0)
+
+            avg = round(sum(vals) / len(vals), 2) if vals else None
+            if avg is not None:
+                totals.append(avg)
+
+            row['subjects'][subj.id] = avg
+
+        row['overall'] = round(sum(totals) / len(totals), 2) if totals else None
+        data.append(row)
+
+    return group, subjects, students, data
 
 @admin_bp.route('/dashboard')
 @jwt_required(locations=["cookies"])
@@ -620,7 +669,8 @@ def assign_subject_to_group(group_id):
             else:
                 assignment = TeacherSubjectGroup(teacher=teacher, subject=subject, group=group)
                 db.session.add(assignment)
-                message = f'Предмет "{subject.name}" назначен группе "{group.name}" и закреплён за преподавателем {teacher.last_name} {teacher.first_name}.'
+                teacher_name = f"{teacher.last_name} {teacher.first_name} {teacher.middle_name or ''}".strip()
+                message = f'Предмет "{subject.name}" назначен группе "{group.name}" и закреплён за преподавателем {teacher_name}.'
             db.session.commit()
 
     return render_template('admin_assign_subject.html', user=user, group=group, teachers=teachers, subjects=subjects, message=message, error=error)
@@ -641,7 +691,7 @@ def group_subjects(group_id):
             'assignment_id': a.id,
             'subject_id': a.subject.id,
             'subject_name': a.subject.name,
-            'teacher_name': f"{a.teacher.last_name} {a.teacher.first_name}" if getattr(a, 'teacher', None) else ''
+            'teacher_name': f"{a.teacher.last_name} {a.teacher.first_name} {a.teacher.middle_name or ''}".strip() if getattr(a, 'teacher', None) else ''
         })
 
     # Format avatar path for template
@@ -667,14 +717,7 @@ def group_overview(group_id):
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
 
-    group = StudentGroup.query.get_or_404(group_id)
-
-
-    assignments = TeacherSubjectGroup.query.filter_by(group_id=group_id).all()
-    subject_ids = list({a.subject_id for a in assignments})
-    subjects = Subject.query.filter(Subject.id.in_(subject_ids)).all() if subject_ids else []
-
-    students = User.query.filter_by(group_id=group_id, role='student').order_by(User.last_name, User.first_name).all()
+    group, subjects, students, data = build_group_overview_data(group_id)
     all_groups = StudentGroup.query.order_by(StudentGroup.name).all()
     available_students = User.query.filter(
         User.role == 'student',
@@ -682,49 +725,6 @@ def group_overview(group_id):
     ).order_by(User.last_name, User.first_name).all()
     message = request.args.get('message', '')
     error = request.args.get('error', '0') == '1'
-
-    subj_map = {s.id: s.name for s in subjects}
-    data = []
-
-    for student in students:
-        row = {
-            'student_id': student.id,
-            'name': f"{student.last_name} {student.first_name}",
-            'subjects': {},
-            'overall': None
-        }
-        totals = []
-
-        for subj in subjects:
-
-            raw = db.session.query(Grade.value, GradingSystem.max_points) \
-                .join(TeacherSubjectGroup, Grade.teacher_subject_group_id == TeacherSubjectGroup.id) \
-                .outerjoin(GradingSystem, GradingSystem.teacher_subject_group_id == TeacherSubjectGroup.id) \
-                .filter(Grade.student_id == student.id) \
-                .filter(TeacherSubjectGroup.subject_id == subj.id) \
-                .all()
-
-            vals = []
-            for val, max_p in raw:
-                if val is None:
-                    continue
-                if max_p:
-                    current_max = max_p
-                else:
-                    current_max = 5.0 if (val <= 5.0 and val > 0) else 100.0
-                if current_max <= 0:
-                    current_max = 100
-                normalized = (val / current_max) * 5.0
-                vals.append(normalized)
-
-            avg = round(sum(vals)/len(vals),2) if vals else None
-            if avg is not None:
-                totals.append(avg)
-
-            row['subjects'][subj.id] = avg
-
-        row['overall'] = round(sum(totals)/len(totals),2) if totals else None
-        data.append(row)
 
     # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
@@ -741,6 +741,36 @@ def group_overview(group_id):
         message=message,
         error=error
     )
+
+
+@admin_bp.route('/group/<int:group_id>/overview/export')
+@role_required('admin')
+def export_group_overview_excel(group_id):
+    group, subjects, students, data = build_group_overview_data(group_id)
+
+    rows = []
+    for row in data:
+        export_row = {'Студент': row['name']}
+        for subject in subjects:
+            value = row['subjects'].get(subject.id)
+            export_row[subject.name] = value if value is not None else '-'
+        export_row['Итог'] = row['overall'] if row['overall'] is not None else '-'
+        rows.append(export_row)
+
+    df = pd.DataFrame(rows)
+    if df.empty:
+        columns = ['Студент'] + [subject.name for subject in subjects] + ['Итог']
+        df = pd.DataFrame(columns=columns)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Обзор группы', index=False)
+        format_excel_width(writer)
+
+    output.seek(0)
+    safe_group_name = re.sub(r'[\\/:*?"<>|]+', '_', group.name).strip() or 'group'
+    filename = f"Group_{safe_group_name}_{datetime.now().strftime('%d.%m.%Y')}.xlsx"
+    return send_file(output, download_name=filename, as_attachment=True)
 
 
 @admin_bp.route('/group/<int:group_id>/student/<int:student_id>/move', methods=['POST'])

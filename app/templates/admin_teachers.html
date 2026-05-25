@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -51,28 +51,10 @@
 
         @media (max-width:900px){.container{padding:0 12px};.search-bar{flex-direction:column}.search-bar input,.search-bar select{width:100%}}
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_header.css') }}">
 </head>
 <body>
-<header>
-    <img src="{{ url_for('static', filename='logotip.png') }}" alt="НовГУ" class="logo-img"/>
-    <nav>
-    <a href="{{ url_for('admin.pending_teachers') }}">Подтверждение преподавателя</a>
-    <a href="{{ url_for('admin.student_rating_page') }}">Рейтинг</a>
-    <details class="nav-dropdown" style="position:relative;display:inline-block">
-        <summary style="list-style:none;cursor:pointer;color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;white-space:nowrap">Структура</summary>
-        <div style="position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid #e8eff7;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:8px;z-index:20">
-            <a href="{{ url_for('admin.structure_management') }}" style="display:block;color:#002fa7;padding:9px 10px">Структура</a>
-            <a href="{{ url_for('admin.admin_teachers') }}" style="display:block;color:#002fa7;padding:9px 10px">Преподаватели</a>
-            <a href="{{ url_for('admin.groups_list') }}" style="display:block;color:#002fa7;padding:9px 10px">Группы</a>
-        </div>
-    </details>
-    <a href="{{ url_for('main.profile') }}">Личный кабинет</a>
-</nav>
-    <div class="header-right">
-        <span class="username">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</span>
-        <img src="{{ url_for('static', filename=user.avatar if user.avatar else 'avatar.png') }}" alt="Аватар" class="avatar">
-    </div>
-</header>
+{% include 'admin_header.html' %}
 
 <div class="container">
     <h1>Преподаватели</h1>
@@ -81,7 +63,7 @@
     {% endif %}
     
     <div class="search-bar">
-        <input id="teacherSearch" type="text" placeholder="Поиск по фамилии, имени, email...">
+        <input id="teacherSearch" type="text" placeholder="Поиск по фамилии, имени, отчеству, email...">
         <select id="universityFilter">
             <option value="">Все университеты</option>
             {% for university in universities %}
@@ -94,18 +76,16 @@
         <table id="teachers-table">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Фамилия</th>
-                    <th onclick="sortTable(1)">Имя</th>
-                    <th onclick="sortTable(2)">Email</th>
-                    <th onclick="sortTable(3)">Университеты</th>
+                    <th onclick="sortTable(0)">ФИО</th>
+                    <th onclick="sortTable(1)">Email</th>
+                    <th onclick="sortTable(2)">Университеты</th>
                     <th style="width:220px">Действие</th>
                 </tr>
             </thead>
             <tbody>
                 {% for teacher in teachers %}
-                <tr class="teacher-row" data-search="{{ (teacher.last_name + ' ' + teacher.first_name + ' ' + teacher.email).lower() }}" data-university="{{ teacher.universities|map(attribute='name')|join(' ')|lower }}">
-                    <td>{{ teacher.last_name }}</td>
-                    <td>{{ teacher.first_name }}</td>
+                <tr class="teacher-row" data-search="{{ (teacher.last_name + ' ' + teacher.first_name + ' ' + (teacher.middle_name or '') + ' ' + teacher.email).lower() }}" data-university="{{ teacher.universities|map(attribute='name')|join(' ')|lower }}">
+                    <td>{{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.middle_name or '' }}</td>
                     <td>{{ teacher.email }}</td>
                     <td>
                         <form class="teacher-universities teacher-university-form" method="POST" action="{{ url_for('admin.update_teacher_universities', user_id=teacher.id) }}">
@@ -130,12 +110,12 @@
                         </form>
                     </td>
                     <td>
-                        <button class="delete-button" onclick="openDeleteModal({{ teacher.id }}, '{{ teacher.last_name }} {{ teacher.first_name }}')">Удалить</button>
+                        <button class="delete-button" onclick="openDeleteModal({{ teacher.id }}, '{{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.middle_name or '' }}')">Удалить</button>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" style="text-align:center;color:#666">Нет зарегистрированных преподавателей.</td>
+                    <td colspan="4" style="text-align:center;color:#666">Нет зарегистрированных преподавателей.</td>
                 </tr>
                 {% endfor %}
             </tbody>

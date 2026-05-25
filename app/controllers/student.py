@@ -41,7 +41,7 @@ def dashboard():
         courses_data.append({
             'assignment_id': assignment.id,
             'subject_name': assignment.subject.name,
-            'teacher_name': f"{assignment.teacher.last_name} {assignment.teacher.first_name}",
+            'teacher_name': f"{assignment.teacher.last_name} {assignment.teacher.first_name} {assignment.teacher.middle_name or ''}".strip(),
             'group_name': assignment.group.name,
             'grades_count': len(grades),
             'average_grade': average_grade
@@ -94,8 +94,7 @@ def dashboard():
         'univ': f"{r_univ_val} / {r_univ_total}"
     }
 
-    # Format avatar path for template
-    # Format avatar path for template
+
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('prod/glav.html',
