@@ -1,0 +1,101 @@
+[
+  {
+    "group": "4991",
+    "subjects": [
+      {
+        "name": "Графический дизайн и мультимедия",
+        "teacher_email": "kryzhova@example.com"
+      },
+      {
+        "name": "Операционные системы и среды",
+        "teacher_email": "varfolomeeva@example.com"
+      },
+      {
+        "name": "Основы алгоритмитизации и программирования",
+        "teacher_email": "egorova@example.com"
+      },
+      {
+        "name": "Информационные технологии",
+        "teacher_email":"cizova@example.com"
+      },
+      {
+        "name": "Дискретная математика и элементы математической логики",
+        "teacher_email": "alexeeva@example.com"
+      },
+      {
+        "name": "Инструментальные средства разработки программного обеспечения",
+        "teacher_email": "burbax@example.com"
+      },
+      {
+        "name": "Элементы высшей математики",
+        "teacher_email": "shirina@example.com"
+      },
+      {
+        "name": "Основы проектной деятельности",
+        "teacher_email": "varfolomeeva@example.com"
+      },
+      {
+        "name": "Физическая культура",
+        "teacher_email": "ivanov@example.com"
+      },
+      {
+        "name": "Проектирование и разработка веб приложений",
+        "teacher_email": "afanaseva@example.com"
+      }
+    ]
+  },
+  {
+    "group": "4992",
+    "subjects": [
+      {
+        "name": "Графический дизайн и мультимедия",
+        "teacher_email": "kryzhova@example.com"
+      },
+      {
+        "name": "Операционные системы и среды",
+        "teacher_email": "varfolomeeva@example.com"
+      },
+      {
+        "name": "Основы алгоритмитизации и программирования",
+        "teacher_email": "egorova@example.com"
+      },
+      {
+        "name": "Информационные технологии",
+        "teacher_email":"cizova@example.com"
+      },
+      {
+        "name": "Дискретная математика и элементы математической логики",
+        "teacher_email": "alexeeva@example.com"
+      },
+      {
+        "name": "Инструментальные средства разработки программного обеспечения",
+        "teacher_email": "burbax@example.com"
+      },
+      {
+        "name": "Элементы высшей математики",
+        "teacher_email": "shirina@example.com"
+      },
+      {
+        "name": "Основы проектной деятельности",
+        "teacher_email": "varfolomeeva@example.com"
+      },
+      {
+        "name": "Физическая культура",
+        "teacher_email": "ivanov@example.com"
+      },
+      {
+        "name": "Проектирование и разработка веб приложений",
+        "teacher_email": "afanaseva@example.com"
+      }
+    ]
+  },
+  {
+    "group": "3093",
+    "subjects": [
+      {
+        "name": "java",
+        "teacher_email": "kylakov@example.com"
+      }
+    ]
+  }
+]

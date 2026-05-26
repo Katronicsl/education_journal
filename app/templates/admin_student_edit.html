@@ -5,30 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактирование студента</title>
     <style>
-        :root{--blue:#002FA7;--bg:#f7fafd}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
-        .container{max-width:900px;margin:36px auto;padding:0 18px}
-        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722}
-        nav{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
-        nav a{color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s}
-        nav a:hover{background:#EEA200;color:#fff}
-        .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-        .header-right img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff}
-        .card{background:#fff;border-radius:18px;padding:24px;margin-top:24px;border:1px solid #e8eff7}
-        h1{color:var(--blue);margin-top:0}
-        .back-link{display:inline-block;margin-bottom:18px;color:#002fa7;text-decoration:none;font-weight:700}
-        .message{padding:14px 18px;border-radius:14px;margin-bottom:16px}
-        .message.success{background:#eaf7f1;color:#0f6f47}
-        .message.error{background:#ffe6e6;color:#9b1b1b}
-        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        .form-group{display:flex;flex-direction:column;gap:8px}
-        .form-group.full{grid-column:1 / -1}
-        label{font-weight:700}
-        input,select{padding:12px;border:1px solid #d1d9e6;border-radius:12px;font-size:15px;background:#fff}
-        .button{display:inline-block;padding:12px 22px;border:none;border-radius:14px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer;text-decoration:none;margin-top:18px}
-        .muted{color:#64748b}
-        @media (max-width:700px){.form-grid{grid-template-columns:1fr}}
+        :root {
+            --blue: #002FA7;
+            --bg: #f7fafd;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI',Arial,sans-serif;
+            background: var(--bg);
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 36px auto;
+            padding: 0 18px;
+        }
+
+        header {
+            background: linear-gradient(90deg,#002FA7 60%,#3359D1 100%);
+            color: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            box-shadow: 0 3px 12px #002fa722;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.22s,color 0.15s;
+        }
+
+        nav a:hover {
+            background: #EEA200;
+            color: #fff;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-right img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            margin-top: 24px;
+            border: 1px solid #e8eff7;
+        }
+
+        h1 {
+            color: var(--blue);
+            margin-top: 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #002fa7;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+
+        .message.success {
+            background: #eaf7f1;
+            color: #0f6f47;
+        }
+
+        .message.error {
+            background: #ffe6e6;
+            color: #9b1b1b;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 700;
+        }
+
+        input,select {
+            padding: 12px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fff;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 14px;
+            background: #002fa7;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 18px;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        @media (max-width:700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_header.css') }}">
 </head>

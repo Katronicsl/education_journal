@@ -17,6 +17,7 @@
             overflow: hidden;
             background: #f5f7fa;
         }
+
         .bg-text {
             position: fixed;
             top: 0;
@@ -26,6 +27,7 @@
             pointer-events: none;
             z-index: 0;
         }
+
         .bg-text::before {
             content: "НОВГУ НОВГУ   НОВГУ   НОВГУ   НОВГУ   НОВГУ   НОВГУ   НОВГУ   НОВГУ   НОВГУ";
             position: absolute;
@@ -39,14 +41,18 @@
             white-space: nowrap;
             animation: move-bg 12s linear infinite;
         }
+
         @keyframes move-bg {
             from {
                 transform: translateX(0);
             }
+
             to {
                 transform: translateX(-50vw);
             }
+
         }
+
         .container {
             background: white;
             padding: 30px 40px;
@@ -58,21 +64,25 @@
             position: relative;
             user-select: none;
         }
+
         h1 {
             margin-bottom: 20px;
             color: #222;
         }
+
         p {
             font-size: 18px;
             margin-bottom: 30px;
             color: #555;
         }
+
         .buttons {
             display: flex;
             flex-direction: column;
             gap: 15px;
             align-items: center;
         }
+
         a.button {
             width: 96%;
             min-width: 280px;
@@ -92,11 +102,13 @@
             user-select: none;
             cursor: pointer;
         }
+
         a.button:hover {
             background-color: #EEA200;
             box-shadow: 0 4px 10px rgba(21, 101, 192, 0.7);
             transform: translateY(2px);
         }
+
         a.button:active {
             background-color: #c96b00;
             box-shadow: 0 2px 5px rgba(7, 30, 131, 0.85);

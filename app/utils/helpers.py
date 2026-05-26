@@ -14,7 +14,9 @@ def get_universities_data():
     return univs_data
 
 def init_universities():
-    """Initialize database with universities and groups"""
+    """Deprecated: universities, courses and groups are managed from the admin panel."""
+    return
+
     StudentGroup.query.delete()
     Course.query.delete()
     University.query.delete()

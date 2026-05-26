@@ -70,12 +70,6 @@ def create_app(config_name='development'):
                 db.session.add(admin)
                 db.session.commit()
             
-            # Initialize universities if empty
-            from app.models.course import University
-            if not University.query.first():
-                from app.utils.helpers import init_universities
-                init_universities()
-            
             app._db_initialized = True
     
     # Create app context for database operations

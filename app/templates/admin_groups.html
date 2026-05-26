@@ -5,28 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Группы (админ)</title>
     <style>
-        :root{--blue:#002FA7;--muted:#666;--card:#fff;--bg:#f7fafd}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+        :root {
+            --blue: #002FA7;
+            --muted: #666;
+            --card: #fff;
+            --bg: #f7fafd;
+        }
 
-        .container{max-width:1100px;margin:36px auto;background:transparent;padding:0 18px}
+        * {
+            box-sizing: border-box;
+        }
 
-        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722;position:relative;z-index:2}
-        header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#e5eaf8;opacity:0.18;border-bottom-left-radius:34px;border-bottom-right-radius:34px;pointer-events:none}
-        .logo{flex-shrink:0;margin-right:18px}
-        .logo-img{width:56px;height:56px;object-fit:cover;border-radius:50%;background:#fff;user-select:none}
-        nav{display:flex;gap:8px;flex-shrink:0}
-        nav a{color:#fff;text-decoration:none;font-size:18px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s;white-space:nowrap}
-        nav a:hover,nav a:focus{background:#EEA200;color:#ffffff}
-        .header-right{display:flex;align-items:center;gap:10px;margin-left:auto;margin-right:2px;flex-shrink:0}
-        .username{font-size:15px;color:#fff;white-space:nowrap}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI',Arial,sans-serif;
+            background: var(--bg);
+            color: #222;
+        }
 
-        .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
-        .group-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #e8f0ff;text-decoration:none;color:inherit;display:block}
-        .group-name{font-size:18px;font-weight:700;color:var(--blue)}
-        .group-info{color:#666;margin-top:6px}
+        .container {
+            max-width: 1100px;
+            margin: 36px auto;
+            background: transparent;
+            padding: 0 18px;
+        }
 
-        @media (max-width:900px){.container{padding:0 12px}}
+        header {
+            background: linear-gradient(90deg,#002FA7 60%,#3359D1 100%);
+            color: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            box-shadow: 0 3px 12px #002fa722;
+            position: relative;
+            z-index: 2;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: #e5eaf8;
+            opacity: 0.18;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            pointer-events: none;
+        }
+
+        .logo {
+            flex-shrink: 0;
+            margin-right: 18px;
+        }
+
+        .logo-img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #fff;
+            user-select: none;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.22s,color 0.15s;
+            white-space: nowrap;
+        }
+
+        nav a:hover,nav a:focus {
+            background: #EEA200;
+            color: #ffffff;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            margin-right: 2px;
+            flex-shrink: 0;
+        }
+
+        .username {
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+            gap: 18px;
+        }
+
+        .group-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid #e8f0ff;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .group-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .group-info {
+            color: #666;
+            margin-top: 6px;
+        }
+
+        @media (max-width:900px) {
+            .container {
+                padding: 0 12px;
+            }
+
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_header.css') }}">
 </head>

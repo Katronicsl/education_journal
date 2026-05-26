@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import db
 from app.models.user import User
 from app.utils.decorators import role_required
-from app.utils.helpers import init_universities, format_excel_width
+from app.utils.helpers import format_excel_width
 from app.models.course import University, Course, StudentGroup
 from app.models.subject import TeacherSubjectGroup, Subject, GradingSystem
 from app.models.lesson import Lesson, Grade, Attendance
@@ -130,8 +130,6 @@ def change_login():
 def init_db():
     """Initialize database"""
     db.create_all()
-    if not User.query.first():
-        init_universities()
     return "Database initialized"
 
 

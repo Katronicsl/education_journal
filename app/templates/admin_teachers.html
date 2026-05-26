@@ -5,51 +5,291 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Преподаватели (админ)</title>
     <style>
-        :root{--blue:#002FA7;--muted:#666;--card:#fff;--bg:#f7fafd}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#222}
+        :root {
+            --blue: #002FA7;
+            --muted: #666;
+            --card: #fff;
+            --bg: #f7fafd;
+        }
 
-        .container{max-width:1100px;margin:36px auto;background:transparent;padding:0 18px}
+        * {
+            box-sizing: border-box;
+        }
 
-        header{background:linear-gradient(90deg,#002FA7 60%,#3359D1 100%);color:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom-left-radius:34px;border-bottom-right-radius:34px;box-shadow:0 3px 12px #002fa722;position:relative;z-index:2}
-        header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#e5eaf8;opacity:0.18;border-bottom-left-radius:34px;border-bottom-right-radius:34px;pointer-events:none}
-        .logo{flex-shrink:0;margin-right:18px}
-        .logo-img{width:56px;height:56px;object-fit:cover;border-radius:50%;background:#fff;user-select:none}
-        nav{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
-        nav a{color:#fff;text-decoration:none;font-size:17px;padding:6px 10px;border-radius:10px;transition:background 0.22s,color 0.15s;white-space:nowrap}
-        nav a:hover,nav a:focus{background:#EEA200;color:#ffffff}
-        .header-right{display:flex;align-items:center;gap:10px;margin-left:auto;margin-right:2px;flex-shrink:0}
-        .username{font-size:15px;color:#fff;white-space:nowrap}
-        .avatar{width:28px;height:28px;border-radius:50%;background:#fff;object-fit:cover}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI',Arial,sans-serif;
+            background: var(--bg);
+            color: #222;
+        }
 
-        h1{color:var(--blue);margin-top:24px;margin-bottom:18px}
+        .container {
+            max-width: 1100px;
+            margin: 36px auto;
+            background: transparent;
+            padding: 0 18px;
+        }
 
-        .search-bar{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-        .search-bar input, .search-bar select{padding:12px 14px;border:1px solid #d1d9e6;border-radius:12px;font-size:15px}
-        .search-bar input{flex:1;min-width:220px}
-        .search-bar select{min-width:180px}
+        header {
+            background: linear-gradient(90deg,#002FA7 60%,#3359D1 100%);
+            color: #fff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            box-shadow: 0 3px 12px #002fa722;
+            position: relative;
+            z-index: 2;
+        }
 
-        .message{padding:14px 18px;border-radius:14px;margin-bottom:16px}
-        .message.success{background:#eaf7f1;color:#0f6f47}
-        .message.error{background:#ffe6e6;color:#9b1b1b}
+        header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: #e5eaf8;
+            opacity: 0.18;
+            border-bottom-left-radius: 34px;
+            border-bottom-right-radius: 34px;
+            pointer-events: none;
+        }
 
-        .table-wrapper{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e8f0ff}
-        table{width:100%;border-collapse:collapse}
-        th,td{padding:14px 16px;text-align:left;border-bottom:1px solid #eef4fb}
-        th{cursor:pointer;color:#002fa7;background:#f7fbff;font-weight:700;user-select:none}
-        th:hover{background:#eef4fb}
-        tr:hover{background:#f5f8ff}
-        .teacher-universities{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
-        .teacher-picker{min-width:240px;max-width:340px;padding:8px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;background:#fff}
-        .university-editor{display:flex;flex-direction:column;gap:10px;min-width:280px}
-        .university-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-        .university-tag{display:inline-flex;gap:6px;align-items:center;padding:7px 9px;border-radius:10px;background:#E7F1FF;color:#002fa7;font-weight:700;font-size:13px}
-        .tag-remove{border:none;background:transparent;color:#d10000;cursor:pointer;font-size:18px;font-weight:800;line-height:1;padding:0 2px}
-        .save-button{padding:8px 12px;border:none;border-radius:10px;background:#002fa7;color:#fff;font-weight:700;cursor:pointer;font-size:14px}
-        .delete-button{padding:8px 12px;border:none;border-radius:10px;background:#d10000;color:#fff;font-weight:700;cursor:pointer;font-size:14px;transition:background .2s}
-        .delete-button:hover{background:#a30000}
+        .logo {
+            flex-shrink: 0;
+            margin-right: 18px;
+        }
 
-        @media (max-width:900px){.container{padding:0 12px};.search-bar{flex-direction:column}.search-bar input,.search-bar select{width:100%}}
+        .logo-img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #fff;
+            user-select: none;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.22s,color 0.15s;
+            white-space: nowrap;
+        }
+
+        nav a:hover,nav a:focus {
+            background: #EEA200;
+            color: #ffffff;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            margin-right: 2px;
+            flex-shrink: 0;
+        }
+
+        .username {
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: var(--blue);
+            margin-top: 24px;
+            margin-bottom: 18px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input, .search-bar select {
+            padding: 12px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 12px;
+            font-size: 15px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-bar select {
+            min-width: 180px;
+        }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+
+        .message.success {
+            background: #eaf7f1;
+            color: #0f6f47;
+        }
+
+        .message.error {
+            background: #ffe6e6;
+            color: #9b1b1b;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e8f0ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eef4fb;
+        }
+
+        th {
+            cursor: pointer;
+            color: #002fa7;
+            background: #f7fbff;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        th:hover {
+            background: #eef4fb;
+        }
+
+        tr:hover {
+            background: #f5f8ff;
+        }
+
+        .teacher-universities {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .teacher-picker {
+            min-width: 240px;
+            max-width: 340px;
+            padding: 8px;
+            border: 1px solid #d1d9e6;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .university-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 280px;
+        }
+
+        .university-tags {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .university-tag {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            padding: 7px 9px;
+            border-radius: 10px;
+            background: #E7F1FF;
+            color: #002fa7;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .tag-remove {
+            border: none;
+            background: transparent;
+            color: #d10000;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+            padding: 0 2px;
+        }
+
+        .save-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            background: #002fa7;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            background: #d10000;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background .2s;
+        }
+
+        .delete-button:hover {
+            background: #a30000;
+        }
+
+        @media (max-width:900px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-bar input,.search-bar select {
+                width: 100%;
+            }
+
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_header.css') }}">
 </head>

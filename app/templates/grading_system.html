@@ -6,11 +6,12 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background:white;
+            background: white;
             min-height: 100vh;
             padding: 20px;
             margin: 0;
         }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -19,20 +20,24 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
+
         .header {
             background: linear-gradient(135deg, #002FA7, #0056b3);
             color: white;
             padding: 25px 40px;
             border-bottom: 1px solid #e1e5e9;
         }
+
         .header h1 {
             margin: 0;
             font-size: 28px;
             font-weight: 600;
         }
+
         .content {
             padding: 40px;
         }
+
         .system-option {
             border: 2px solid #e0e0e0;
             border-radius: 15px;
@@ -43,16 +48,19 @@
             background: #f8f9fa;
             position: relative;
         }
+
         .system-option:hover {
             border-color: #002FA7;
             background: #f0f4ff;
             transform: translateY(-2px);
         }
+
         .system-option.selected {
             border-color: #002FA7;
             background: #e7f1ff;
             box-shadow: 0 5px 15px rgba(0, 47, 167, 0.2);
         }
+
         .system-title {
             font-size: 20px;
             font-weight: 600;
@@ -62,11 +70,13 @@
             align-items: center;
             gap: 10px;
         }
+
         .system-description {
             color: #666;
             margin-bottom: 15px;
             line-height: 1.5;
         }
+
         .system-params {
             margin-top: 25px;
             padding: 25px;
@@ -75,23 +85,26 @@
             border-left: 4px solid #002FA7;
             display: none;
         }
+
         .params-group {
             display: none;
         }
+
         .params-group.active {
             display: block;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
         }
-        
-       
+
         input[type="number"], input[type="text"], select {
             width: 100%;
             padding: 12px 15px;
@@ -100,10 +113,12 @@
             font-size: 16px;
             transition: border-color 0.3s;
         }
+
         input:focus, select:focus {
             border-color: #002FA7;
             outline: none;
         }
+
         .btn {
             padding: 15px 30px;
             border: none;
@@ -116,30 +131,36 @@
             display: inline-block;
             margin-right: 15px;
         }
+
         .btn-primary {
             background: #28a745;
             color: white;
         }
+
         .btn-primary:hover {
             background: #218838;
             transform: translateY(-2px);
         }
+
         .btn-secondary {
             background: #6c757d;
             color: white;
         }
+
         .btn-secondary:hover {
             background: #5a6268;
         }
+
         .btn-container {
             margin-top: 30px;
             text-align: center;
         }
+
         input[type="radio"] {
             margin-right: 10px;
             transform: scale(1.2);
         }
-        
+
         .calculation-method-block {
             background: #fff;
             border: 2px solid #e0e0e0;
@@ -148,11 +169,13 @@
             margin: 20px 0;
             border-left: 5px solid #ffc107;
         }
+
         .radio-flex {
             display: flex;
             gap: 30px;
             margin-top: 10px;
         }
+
         .radio-label {
             display: flex;
             align-items: center;
@@ -162,16 +185,17 @@
             border-radius: 8px;
             transition: background 0.2s;
         }
+
         .radio-label:hover {
             background: #f8f9fa;
         }
+
         .help-text {
             font-size: 13px;
             color: #666;
             margin-top: 5px;
         }
-        
-        
+
         .error-message {
             color: #dc3545;
             font-size: 14px;

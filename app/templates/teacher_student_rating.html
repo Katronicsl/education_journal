@@ -5,9 +5,12 @@
     <title>Топ студентов</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #1c1e21; }
-        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
 
         header {
             background: linear-gradient(90deg, #002FA7 60%, #3359D1 100%);
@@ -20,34 +23,89 @@
             border-bottom-right-radius: 34px;
             box-shadow: 0 3px 12px #002fa722;
             position: relative;
-            z-index: 100; 
+            z-index: 100;
         }
-        .logo { margin-left: 20px; }
+
+        .logo {
+            margin-left: 20px;
+        }
+
         .logo-img {
-            width: 56px; height: 56px; object-fit: cover; border-radius: 50%;
-            display: block; background: #fff; user-select: none;
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            background: #fff;
+            user-select: none;
         }
-        nav { display: flex; gap: 8px; margin-left: 18px; margin-right: auto; }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            margin-left: 18px;
+            margin-right: auto;
+        }
+
         nav a {
-            color: #fff; text-decoration: none; font-size: 18px; padding: 6px 10px;
-            border-radius: 10px; transition: background 0.22s, color 0.15s;
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.22s, color 0.15s;
         }
-        nav a:hover, nav a:focus { background: #EEA200; color: #ffffff; }
-        
-        .header-right { margin-left:auto; display: flex; align-items: center; gap: 12px; margin-right: 22px; }
 
-        .user-menu-wrap { position: relative; display: flex; align-items: center; }
-        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; transition: opacity 0.2s; }
-        .user-info:hover { opacity: 0.9; }
-        
-        .username { font-size: 15px; color: #fff; white-space: nowrap; }
-        .avatar { width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: cover; }
+        nav a:hover, nav a:focus {
+            background: #EEA200;
+            color: #ffffff;
+        }
 
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 22px;
+        }
+
+        .user-menu-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+
+        .user-info:hover {
+            opacity: 0.9;
+        }
+
+        .username {
+            font-size: 15px;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            object-fit: cover;
+        }
 
         .dropdown-menu {
-            display: none; 
+            display: none;
             position: absolute;
-            top: 140%; 
+            top: 140%;
             right: 0;
             width: 220px;
             background: #fff;
@@ -60,117 +118,323 @@
             animation: fadeInMenu 0.2s ease-in-out;
             border: 1px solid #f0f2f5;
         }
-        .dropdown-menu.show { display: flex; }
+
+        .dropdown-menu.show {
+            display: flex;
+        }
+
         .dropdown-menu::before {
-            content: ''; position: absolute; top: -6px; right: 20px;
-            width: 12px; height: 12px; background: #fff;
-            transform: rotate(45deg); border-top: 1px solid #f0f2f5; border-left: 1px solid #f0f2f5;
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            transform: rotate(45deg);
+            border-top: 1px solid #f0f2f5;
+            border-left: 1px solid #f0f2f5;
         }
 
         .btn-edit-profile {
-            display: block; background: #002FA7; color: #fff; text-align: center;
-            padding: 10px 0; border-radius: 10px; text-decoration: none;
-            font-size: 15px; font-weight: 600; transition: background 0.2s;
+            display: block;
+            background: #002FA7;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s;
         }
-        .btn-edit-profile:hover { background: #EEA200; }
-        
+
+        .btn-edit-profile:hover {
+            background: #EEA200;
+        }
+
         .btn-logout {
-            display: block; text-align: center; color: #d32f2f; text-decoration: none;
-            font-size: 15px; font-weight: 500; padding: 8px 0; border-radius: 8px; transition: background 0.1s;
+            display: block;
+            text-align: center;
+            color: #d32f2f;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 0;
+            border-radius: 8px;
+            transition: background 0.1s;
         }
-        .btn-logout:hover { background: #fff0f0; }
 
-     
-        .container { max-width: 950px; margin: 40px auto; padding: 0 20px; }
-        
-        h1 { text-align: center; color: #002FA7; margin-bottom: 5px; font-size: 28px; }
-        
-    
-        .subtitle { text-align: center; color: #65676b; margin-bottom: 10px; font-size: 16px; }
-        
-        
+        .btn-logout:hover {
+            background: #fff0f0;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #002FA7;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #65676b;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
         .system-note {
-            text-align: center; font-size: 13px; color: #198754; background-color: #e6f6ec;
-            padding: 8px 16px; border-radius: 20px; display: inline-block;
-            margin: 0 auto 25px auto; font-weight: 500;
+            text-align: center;
+            font-size: 13px;
+            color: #198754;
+            background-color: #e6f6ec;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 auto 25px auto;
+            font-weight: 500;
         }
-        .center-wrapper { text-align: center; }
 
+        .center-wrapper {
+            text-align: center;
+        }
 
         .excel-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 24px; background: #198754; color: white; border: none; border-radius: 50px;
-            font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(25, 135, 84, 0.2); margin-bottom: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(25, 135, 84, 0.2);
+            margin-bottom: 25px;
         }
-        .excel-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(25, 135, 84, 0.3); background: #146c43; }
 
+        .excel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(25, 135, 84, 0.3);
+            background: #146c43;
+        }
 
-        .tabs-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 35px; }
+        .tabs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
         .tab-btn {
-            padding: 12px 28px; background: white; border: none; border-radius: 50px;
-            font-size: 15px; font-weight: 600; color: #606770; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 8px;
-        }
-        .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #002FA7; }
-        .tab-btn.active { 
-            background: #002FA7; color: white; 
-            box-shadow: 0 4px 15px rgba(0, 47, 167, 0.25); transform: translateY(-2px);
+            padding: 12px 28px;
+            background: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #606770;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-
-        .rating-section { display: none; animation: fadeIn 0.4s ease-out; }
-        .rating-section.active { display: block; }
-        
-        .table-card { 
-            background: white; border-radius: 24px; overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #f0f2f5;
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: #002FA7;
         }
-        
-        table { width: 100%; border-collapse: collapse; }
-        
-        th { 
-            background: #f8f9fa; padding: 20px 25px; text-align: left; 
-            font-size: 12px; text-transform: uppercase; color: #8a8d91; letter-spacing: 0.5px; font-weight: 700;
+
+        .tab-btn.active {
+            background: #002FA7;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 47, 167, 0.25);
+            transform: translateY(-2px);
         }
-        td { padding: 18px 25px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background-color: #fafbff; }
 
+        .rating-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
 
-        .student-cell { display: flex; align-items: center; gap: 18px; }
-        
-        .table-avatar { 
-            width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .rating-section.active {
+            display: block;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 1px solid #f0f2f5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #8a8d91;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 18px 25px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #fafbff;
+        }
+
+        .student-cell {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .table-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
-        tr:hover .table-avatar { transform: scale(1.1); }
 
-        .student-name { font-weight: 600; font-size: 16px; color: #050505; display: block; }
-        .student-group { font-size: 13px; color: #65676b; font-weight: 400; }
-
- 
-        .rank-cell { width: 70px; text-align: center; font-size: 18px; font-weight: 800; color: #bcc0c4; }
-        .medal { font-size: 28px; display: block; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-        .rank-1 { color: #FFD700; } 
-        .rank-2 { color: #C0C0C0; } 
-        .rank-3 { color: #CD7F32; } 
-        
-      
-        .score-cell { text-align: right; }
-        .score-badge { 
-            display: inline-block; padding: 8px 16px; border-radius: 14px; 
-            background: #eef3f6; color: #1c1e21; font-weight: 700; font-size: 16px;
+        tr:hover .table-avatar {
+            transform: scale(1.1);
         }
-        .score-badge.top { background: #e7fcf3; color: #0f8956; }
-        .score-badge.mid { background: #fff8e1; color: #b98900; }
-        .score-suffix { font-size: 12px; opacity: 0.6; margin-left: 2px; font-weight: 500; }
 
-        .empty-state { padding: 60px; text-align: center; color: #8a8d91; font-style: italic; }
+        .student-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #050505;
+            display: block;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInMenu { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .student-group {
+            font-size: 13px;
+            color: #65676b;
+            font-weight: 400;
+        }
+
+        .rank-cell {
+            width: 70px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: #bcc0c4;
+        }
+
+        .medal {
+            font-size: 28px;
+            display: block;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .rank-1 {
+            color: #FFD700;
+        }
+
+        .rank-2 {
+            color: #C0C0C0;
+        }
+
+        .rank-3 {
+            color: #CD7F32;
+        }
+
+        .score-cell {
+            text-align: right;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 14px;
+            background: #eef3f6;
+            color: #1c1e21;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .score-badge.top {
+            background: #e7fcf3;
+            color: #0f8956;
+        }
+
+        .score-badge.mid {
+            background: #fff8e1;
+            color: #b98900;
+        }
+
+        .score-suffix {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-left: 2px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            padding: 60px;
+            text-align: center;
+            color: #8a8d91;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        @keyframes fadeInMenu {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
     </style>
 </head>
 <body>

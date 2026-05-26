@@ -10,6 +10,7 @@
             background-color: #f7fafd;
             color: #304050;
         }
+
         header {
             background: linear-gradient(90deg, #002FA7 60%, #3359D1 100%);
             color: #fff;
@@ -38,7 +39,6 @@
             pointer-events: none;
         }
 
-
         .logo {
             margin-left: 20px;
         }
@@ -52,8 +52,6 @@
             background: #fff;
             user-select: none;
         }
-
-
 
         nav {
             display: flex;
@@ -71,13 +69,10 @@
             transition: background 0.22s, color 0.15s;
         }
 
-        nav a:hover,
-        nav a:focus {
+        nav a:hover, nav a:focus {
             background: #EEA200;
             color: #ffffff;
         }
-
-
 
         .header-right {
             margin-left: auto;
@@ -112,9 +107,11 @@
             font-weight: 500;
             transition: background 0.16s;
         }
+
         .logout-btn:hover {
             background: #ff7676;
         }
+
         .container {
             max-width: 1200px;
             margin: 40px auto;
@@ -123,6 +120,7 @@
             box-shadow: 0 2px 16px #e0eaff3a;
             padding: 30px 40px;
         }
+
         h1 {
             text-align: center;
             color: #002FA7;
@@ -130,6 +128,7 @@
             font-size: 32px;
             font-weight: 700;
         }
+
         .teachers-table {
             width: 100%;
             border-collapse: collapse;
@@ -139,6 +138,7 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .teachers-table th {
             background: #002FA7;
             color: white;
@@ -147,21 +147,26 @@
             font-weight: 600;
             font-size: 16px;
         }
+
         .teachers-table td {
             padding: 16px;
             border-bottom: 1px solid #e0e0e0;
             font-size: 15px;
         }
+
         .teachers-table tr:hover {
             background-color: #f8f9ff;
         }
+
         .teachers-table tr:last-child td {
             border-bottom: none;
         }
+
         .action-buttons {
             display: flex;
             gap: 10px;
         }
+
         .btn-approve {
             background: #28a745;
             color: white;
@@ -173,9 +178,11 @@
             transition: background 0.2s;
             font-size: 14px;
         }
+
         .btn-approve:hover {
             background: #218838;
         }
+
         .btn-reject {
             background: #dc3545;
             color: white;
@@ -187,9 +194,11 @@
             transition: background 0.2s;
             font-size: 14px;
         }
+
         .btn-reject:hover {
             background: #c82333;
         }
+
         .no-teachers {
             text-align: center;
             padding: 40px;
@@ -199,6 +208,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -206,69 +216,71 @@
             font-size: 12px;
             font-weight: 600;
         }
+
         .status-pending {
             background: #fff3cd;
             color: #856404;
         }
+
         .user-menu-wrap {
-    position: relative;
-}
+            position: relative;
+        }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
 
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 120%;
-    right: 0;
-    width: 220px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    padding: 15px;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
-}
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 120%;
+            right: 0;
+            width: 220px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
 
-.dropdown-menu.show {
-    display: flex;
-}
+        .dropdown-menu.show {
+            display: flex;
+        }
 
-.btn-edit-profile {
-    display: block;
-    background: #343698;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.2s;
-}
+        .btn-edit-profile {
+            display: block;
+            background: #343698;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
 
-.btn-edit-profile:hover {
-    background: #EEA200;
-}
+        .btn-edit-profile:hover {
+            background: #EEA200;
+        }
 
-.btn-logout {
-    display: block;
-    text-align: center;
-    color: #d32f2f;
-    text-decoration: none;
-    padding: 8px 0;
-    border-radius: 8px;
-    transition: 0.2s;
-}
+        .btn-logout {
+            display: block;
+            text-align: center;
+            color: #d32f2f;
+            text-decoration: none;
+            padding: 8px 0;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
 
-.btn-logout:hover {
-    background: #fff0f0;
-}
+        .btn-logout:hover {
+            background: #fff0f0;
+        }
     </style>
 </head>
 <body>
