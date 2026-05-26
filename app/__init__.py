@@ -9,16 +9,13 @@ def create_app(config_name='development'):
     """Application factory"""
     app = Flask(__name__)
     
-    # Load configuration
     app.config.from_object(config[config_name])
-    # Debug: print DB URI and SECRET_KEY to stderr to diagnose encoding issues
     import sys
     try:
         sys.stderr.write(f"SQLALCHEMY_DATABASE_URI repr: {repr(app.config.get('SQLALCHEMY_DATABASE_URI'))}\n")
         sys.stderr.write(f"SECRET_KEY repr: {repr(app.config.get('SECRET_KEY'))}\n")
     except Exception:
         pass
-    # Ensure client encoding is set to utf8 to avoid psycopg2 decode issues
     try:
         uri = app.config.get('SQLALCHEMY_DATABASE_URI')
         if uri and 'client_encoding' not in uri:
@@ -28,12 +25,10 @@ def create_app(config_name='development'):
     except Exception:
         pass
     
-    # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
     jwt = JWTManager(app)
     
-    # Register blueprints
     from app.controllers.auth import auth_bp
     from app.controllers.main import main_bp
     from app.controllers.student import student_bp
@@ -46,17 +41,14 @@ def create_app(config_name='development'):
     app.register_blueprint(teacher_bp)
     app.register_blueprint(admin_bp)
     
-    # Context processor for templates
     from app.utils.helpers import get_subject_image
     app.context_processor(lambda: dict(get_subject_image=get_subject_image))
     
-    # Database initialization
     @app.before_request
     def init_database():
         if not hasattr(app, '_db_initialized'):
             db.create_all()
             
-            # Initialize admin user
             from app.models.user import User
             if not User.query.filter_by(role='admin').first():
                 admin = User(
@@ -72,7 +64,6 @@ def create_app(config_name='development'):
             
             app._db_initialized = True
     
-    # Create app context for database operations
     with app.app_context():
         try:
             db.create_all()

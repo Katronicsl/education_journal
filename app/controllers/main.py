@@ -35,7 +35,6 @@ def profile():
         return redirect(url_for('auth.login'))
 
     if request.method == 'POST':
-        # Handle profile updates
         if request.form.get('first_name'):
             user.first_name = request.form.get('first_name')
         if request.form.get('last_name'):
@@ -49,23 +48,17 @@ def profile():
         if request.form.get('department'):
             user.department = request.form.get('department')
         
-        # Handle avatar upload - either from file input or base64 data
         avatar_data = request.form.get('avatar_data')
         if avatar_data:
-            # Handle base64 avatar from cropper
             try:
-                # Remove data URL prefix if present
                 if ',' in avatar_data:
                     avatar_data = avatar_data.split(',')[1]
                 
-                # Decode base64
                 image_data = base64.b64decode(avatar_data)
                 
-                # Create avatars folder if it doesn't exist
                 avatars_dir = os.path.join('app', 'static', 'avatars')
                 os.makedirs(avatars_dir, exist_ok=True)
                 
-                # Save with simple user ID to reuse/overwrite
                 filename = f"avatar_{user.id}.png"
                 filepath = os.path.join(avatars_dir, filename)
                 
@@ -76,7 +69,6 @@ def profile():
             except Exception as e:
                 print(f"Error saving avatar: {e}")
         elif 'avatar' in request.files:
-            # Handle file input as fallback
             file = request.files['avatar']
             if file and file.filename:
                 avatars_dir = os.path.join('app', 'static', 'avatars')

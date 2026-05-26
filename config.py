@@ -35,15 +35,10 @@ class ProductionConfig(Config):
     }
 
 
-# class TestingConfig(Config):
-#     """Testing configuration"""
-#     TESTING = True
-#     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:@localhost:3306/test_usersdb?charset=utf8mb4"
 
 
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-    # 'testing': TestingConfig,
     'default': DevelopmentConfig
 }

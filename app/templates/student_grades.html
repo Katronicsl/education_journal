@@ -197,7 +197,7 @@
             font-size: 15px;
         }
 
-        /* ЦВЕТА ОЦЕНОК */
+        
         .grade-cell.fail {
             background: #f8d7da;
             color: #721c24;
@@ -410,13 +410,13 @@
             const rowClass = isMe ? 'current-user-row' : '';
             const nameSuffix = isMe ? ' (Вы)' : '';
 
-            // Оценки
+
             const gRow = gradesBody.insertRow();
             gRow.className = rowClass;
             gRow.setAttribute('data-student-id', s.id);
             gRow.innerHTML = `<td class="student-name">${s.last_name} ${s.first_name}${nameSuffix}</td><td class="average-cell">-</td>`;
 
-            // Посещаемость
+
             const aRow = attBody.insertRow();
             aRow.className = rowClass;
             aRow.setAttribute('data-student-id', s.id);
@@ -495,7 +495,7 @@
     }
 
     function createUnifiedColumn(columnId, date, topic, isImportant) {
-        // Оценки
+
         const gHeader = document.getElementById('grades-header').rows[0];
         const gIdx = gHeader.cells.length - 1;
         const gTh = document.createElement('th');
@@ -516,7 +516,7 @@
             cell.setAttribute('data-column-id', columnId);
         }
 
-        // Посещаемость
+
         const aHeader = document.getElementById('attendance-header').rows[0];
         const aIdx = aHeader.cells.length - 1;
         const aTh = document.createElement('th');

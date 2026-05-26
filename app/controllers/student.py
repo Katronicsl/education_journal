@@ -34,7 +34,6 @@ def dashboard():
             Grade.student_id == user.id
         ).all()
         
-        # Calculate average grade for the subject
         valid_grades = [g.value for g in grades if g.value is not None]
         average_grade = round(sum(valid_grades) / len(valid_grades), 2) if valid_grades else 0
         
@@ -118,8 +117,6 @@ def view_assignment(assignment_id):
     if assignment.group_id != user.group_id:
         abort(403)
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('student_grades.html',
@@ -206,8 +203,6 @@ def rating():
     groups_course = get_group_leaderboard('course')
     groups_univ = get_group_leaderboard('univ')
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('rating.html',

@@ -51,7 +51,6 @@ def dashboard():
         'new_courses': 0
     }
 
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('prod/glavte.html',
@@ -146,8 +145,6 @@ def student_rating_page():
                 'students': students_list
             })
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('teacher_student_rating.html', user=user, rating_data=rating_data)
@@ -181,8 +178,6 @@ def subject_groups(subject_id):
             'students_count': len(group.students)
         })
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('teacher_subject_groups.html',
@@ -225,8 +220,6 @@ def group_management(subject_id, group_id):
         }
         students_data.append(student_data)
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('teacher_group_management.html',
@@ -289,8 +282,6 @@ def grading_system(assignment_id):
                               subject_id=assignment.subject_id,
                               group_id=assignment.group_id))
 
-    # Format avatar path for template
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('grading_system.html',
@@ -340,71 +331,18 @@ def create_lesson():
 
     return jsonify({'success': True, 'lesson_id': new_lesson.id})
 
-# @teacher_bp.route('/save_grade', methods=['POST'])
-# @jwt_required(locations=["cookies"])
-# def save_grade():
-#     user_id = get_jwt_identity()
-#     user = User.query.get(int(user_id))
 
-#     if not user or user.role != 'teacher':
-#         return jsonify({'error': 'Forbidden'}), 403
 
-#     try:
-#         data = request.json
-#         student_id = data.get('student_id')
-#         grade_value_raw = data.get('grade_value')
-#         column_id = data.get('lesson_column_id')
-#         assignment_id = data.get('teacher_subject_group_id')
 
-#         assignment = TeacherSubjectGroup.query.filter_by(
-#             teacher_id=user.id, id=assignment_id
-#         ).first()
 
-#         if not assignment:
-#             return jsonify({'error': 'Forbidden'}), 403
 
-#         grade = Grade.query.filter_by(
-#             student_id=student_id,
-#             teacher_subject_group_id=assignment_id,
-#             lesson_column_id=column_id
-#         ).first()
 
-#         if grade_value_raw is None or str(grade_value_raw).strip() == '':
-#             if grade:
-#                 db.session.delete(grade)
-#                 db.session.commit()
-#             return jsonify({'success': True, 'message': 'Grade deleted'})
 
-#         final_display_value = str(grade_value_raw).strip()
-#         final_float_value = 0.0
 
-#         try:
-#             clean_val = final_display_value.replace(',', '.')
-#             final_float_value = float(clean_val)
-#         except ValueError:
-#             final_float_value = 0.0
 
-#         if grade:
-#             grade.value = final_float_value
-#             grade.display_value = final_display_value
-#         else:
-#             grade = Grade(
-#                 student_id=student_id,
-#                 teacher_subject_group_id=assignment_id,
-#                 lesson_column_id=column_id,
-#                 value=final_float_value,
-#                 display_value=final_display_value,
-#                 grade_type='lesson'
-#             )
-#             db.session.add(grade)
 
-#         db.session.commit()
-#         return jsonify({'success': True, 'message': 'Grade saved'})
 
-#     except Exception as e:
-#         db.session.rollback()
 
-#         return jsonify({'error': str(e)}), 500
 
 @teacher_bp.route('/export_group_excel', strict_slashes=False)
 @teacher_bp.route('/export_group_excel/<int:assignment_id>', strict_slashes=False)
@@ -415,7 +353,6 @@ def export_group_excel(assignment_id=None):
     if not user or user.role != 'teacher':
         abort(403)
 
-    # If assignment_id is provided, export specific group data
     if assignment_id:
         if user.role == 'teacher':
             assignment = TeacherSubjectGroup.query.filter_by(id=assignment_id, teacher_id=user.id).first_or_404()
@@ -494,7 +431,6 @@ def export_group_excel(assignment_id=None):
         filename = f"Report_{group.name}_{subject.name}.xlsx"
         return send_file(output, download_name=filename, as_attachment=True)
 
-    # If no assignment_id, export all ratings data
     else:
         rating_data = []
 
@@ -570,7 +506,6 @@ def export_group_excel(assignment_id=None):
                     'students': students_list
                 })
 
-        # Create Excel export with all ratings
         output = BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             for item in rating_data:
@@ -585,7 +520,6 @@ def export_group_excel(assignment_id=None):
         return send_file(output, download_name=filename, as_attachment=True)
 
 
-# API Routes
 
 @teacher_bp.route('/get_group_students/<int:group_id>')
 @jwt_required(locations=["cookies"])
@@ -808,7 +742,6 @@ def save_lesson_data():
         is_important = data.get('is_important', 0) 
         print(is_important)
         
-        # Обработка даты 
         date_obj = datetime.now().date() 
         if date_str:
             try:

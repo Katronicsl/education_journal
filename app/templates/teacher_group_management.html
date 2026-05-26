@@ -246,21 +246,21 @@
             font-weight: bold;
         }
 
-        /* + (Зеленый) */
+        
         .attendance-cell.excused {
             background: #fff3cd;
             color: #856404;
             font-weight: bold;
         }
 
-        /* УП (Желтый) */
+        
         .attendance-cell.absent {
             background: #f8d7da;
             color: #721c24;
             font-weight: bold;
         }
 
-        /* НП (Красный) */
+        
         .attendance-cell.empty {
             background: #f8f9fa;
             color: #6c757d;
@@ -327,7 +327,7 @@
             transform: scale(1.2);
         }
 
-        /* Кнопка удаления (крестик) */
+        
         .delete-column-btn {
             background: #dc3545;
             color: white;
@@ -486,7 +486,7 @@
     let currentColumnId = 1; 
     
 
-    let gradingSystem = { type: 'points', maxPoints: 100, minPoints: -1000, passingGrade: 60 }; // Ставим minPoints -1000 по умолчанию
+    let gradingSystem = { type: 'points', maxPoints: 100, minPoints: -1000, passingGrade: 60 };
     let calculationMethod = 'average'; 
     let currentEditingCell = null;
     let lessonsMap = {}; 
@@ -673,7 +673,7 @@ async function loadSavedAttendance() {
                     } else if (record.status === 'УП') {
                         cell.className = 'attendance-cell excused';
                     } else if (record.status === 'НП' || record.status === '-') {
-                        cell.textContent = 'НП'; // Приводим старые минусы к НП
+                        cell.textContent = 'НП';
                         cell.className = 'attendance-cell absent';
                     } else {
                         cell.className = 'attendance-cell empty';

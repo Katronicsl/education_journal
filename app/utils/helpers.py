@@ -168,14 +168,12 @@ def format_excel_width(writer):
         worksheet = writer.sheets[sheet_name]
         worksheet.sheet_view.showGridLines = False
 
-        # Style header row
         for cell in worksheet[1]:
             cell.font = header_font
             cell.fill = header_fill
             cell.alignment = header_align
             cell.border = border
 
-        # Style data rows
         for row_idx, row in enumerate(worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, max_col=worksheet.max_column), start=2):
             row_fill = odd_row_fill if row_idx % 2 == 0 else None
             for cell in row:
@@ -186,11 +184,9 @@ def format_excel_width(writer):
                 if cell.col_idx == 1:
                     cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
 
-        # Freeze the header row and first column for better navigation
         if worksheet.max_row > 1 and worksheet.max_column > 1:
             worksheet.freeze_panes = 'B2'
 
-        # Adjust column widths
         for column in worksheet.columns:
             max_length = 0
             column_letter = get_column_letter(column[0].column)

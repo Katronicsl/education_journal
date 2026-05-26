@@ -549,7 +549,7 @@
         
         console.log(`DEBUG updateGradeCellStyle: grade="${grade}", numVal=${numVal}, system=${JSON.stringify(gradingSystem)}`);
         
-        // Если не число (например custom система)
+
         if(isNaN(numVal)) {
             const lower = String(grade).toLowerCase();
             if(['2','0','н','н/я','fail','bad','минус'].includes(lower)) {
@@ -560,37 +560,37 @@
             return;
         }
         
-        // Отрицательное значение
+
         if(numVal < 0) { 
             cell.className = 'grade-cell fail'; 
             return; 
         }
         
-        // Определяем проходной балл в зависимости от системы
+
         let threshold;
         let normalizedGrade = numVal;
         
-        // НОРМАЛИЗАЦИЯ: если оценка на 5-балльной шкале, переводим на соответствующую шкалу
+
         if (numVal <= 5 && gradingSystem.maxPoints > 5) {
-            // Это оценка на 5-балльной шкале, нормализуем её
+
             normalizedGrade = (numVal / 5) * gradingSystem.maxPoints;
             console.log(`  Normalized from 5-point scale: ${numVal} → ${normalizedGrade}`);
         }
         
         if (gradingSystem.type === 'custom') {
-            // Для custom системы используем простую логику
+
             threshold = gradingSystem.passingGrade || 60;
         } else if (calculationMethod === 'sum') {
-            // Для суммирования - половина максимальных баллов
+
             threshold = gradingSystem.maxPoints / 2;
         } else {
-            // Для среднего - использует passingGrade
+
             threshold = gradingSystem.passingGrade || 60;
         }
         
         console.log(`  Comparing ${normalizedGrade} >= ${threshold} (threshold)`);
         
-        // Сравниваем значение с порогом
+
         if (normalizedGrade >= threshold) {
             cell.className = 'grade-cell pass';
             console.log(`  → PASS (зеленый)`);
@@ -613,13 +613,13 @@
             const row = table.rows[i];
             let sum = 0, cnt = 0;
             
-            // Собираем оценки со всех колонок кроме последней (Итог)
+
             for (let j = 1; j < row.cells.length - 1; j++) {
                 const valStr = row.cells[j].textContent.trim();
                 if (valStr && valStr !== '-') {
                     let val = parseFloat(valStr.replace(',','.').replace('%',''));
                     if(!isNaN(val) && val >= 0) {
-                        // НОРМАЛИЗАЦИЯ: если оценка на 5-балльной шкале, переводим на соответствующую шкалу
+
                         if (val <= 5 && gradingSystem.maxPoints > 5) {
                             val = (val / 5) * gradingSystem.maxPoints;
                         }
@@ -636,25 +636,25 @@
             } else {
                 let finalScore;
                 
-                // Расчет в зависимости от метода
+
                 if (calculationMethod === 'sum') {
                     finalScore = sum;
                 } else {
                     finalScore = sum / cnt;
                 }
                 
-                // Форматирование и отображение
+
                 let displayScore;
                 if (calculationMethod === 'sum') {
                     displayScore = finalScore.toFixed(0);
                 } else {
-                    // Если были нормализованы оценки, показываем на нормализованной шкале
-                    // но также можно перевести обратно в оригинальную
+
+
                     displayScore = finalScore.toFixed(1);
                 }
                 avgCell.textContent = displayScore;
                 
-                // Определяем цвет в зависимости от проходного балла
+
                 let passingThreshold;
                 if (calculationMethod === 'sum') {
                     passingThreshold = gradingSystem.maxPoints / 2;
@@ -670,7 +670,7 @@
             }
         }
         
-        // Общий средний балл
+
         if (count > 0) {
             if (calculationMethod === 'sum') {
                 document.getElementById('avg-grade').textContent = (totalSum / count).toFixed(0);

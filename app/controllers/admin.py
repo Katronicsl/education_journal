@@ -240,7 +240,6 @@ def subject_groups(subject_id):
             'students_count': len(group.students)
         })
 
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('admin_subject_groups.html', user=user, subject=subject, groups=groups_data)
@@ -692,7 +691,6 @@ def group_subjects(group_id):
             'teacher_name': f"{a.teacher.last_name} {a.teacher.first_name} {a.teacher.middle_name or ''}".strip() if getattr(a, 'teacher', None) else ''
         })
 
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('admin_group_subjects.html', user=user, group=group, subjects=subjects)
@@ -724,7 +722,6 @@ def group_overview(group_id):
     message = request.args.get('message', '')
     error = request.args.get('error', '0') == '1'
 
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template(
@@ -839,13 +836,11 @@ def group_management(subject_id, group_id):
         }
         students_data.append(student_data)
 
-    # Format avatar path for template
     user.avatar = f'avatars/{user.avatar}' if user.avatar else 'avatar.png'
 
     return render_template('admin_group_management.html', user=user, subject=subject, group=group, teacher=teacher, students_data=students_data, lessons=lessons, assignment_id=assignment.id)
 
 
-# ========== API ENDPOINTS FOR ADMIN GROUP MANAGEMENT ==========
 
 @admin_bp.route('/api/get_lessons_data')
 @jwt_required(locations=["cookies"])
@@ -873,7 +868,6 @@ def api_get_lessons_data():
         ).order_by(Lesson.date).all()
         print(f"DEBUG: Found {len(lessons)} lessons with data_type={data_type}")
     else:
-        # Get all lessons when data_type is not specified
         lessons = Lesson.query.filter_by(
             teacher_subject_group_id=assignment_id
         ).order_by(Lesson.date).all()
@@ -911,7 +905,6 @@ def api_get_all_grades():
     if not assignment:
         return jsonify({'error': 'Assignment not found'}), 404
 
-    # Get all grades for this assignment
     grades = Grade.query.filter_by(teacher_subject_group_id=assignment_id).all()
 
     grades_data = []
@@ -950,7 +943,6 @@ def api_get_attendance_data():
         print(f"ERROR: Assignment {assignment_id} not found")
         return jsonify({'error': 'Assignment not found'}), 404
 
-    # Get all lessons for this assignment (both grades and attendance)
     lessons = Lesson.query.filter_by(teacher_subject_group_id=assignment_id).all()
     lesson_ids = [l.id for l in lessons]
     
@@ -962,7 +954,6 @@ def api_get_attendance_data():
         print(f"WARNING: No lessons found for assignment {assignment_id}")
         return jsonify([])
 
-    # Check total attendance records in DB
     total_attendance = Attendance.query.count()
     print(f"DEBUG: Total attendance records in database: {total_attendance}")
     
@@ -972,7 +963,6 @@ def api_get_attendance_data():
     for r in records:
         print(f"  - Student ID: {r.student_id}, Lesson ID: {r.lesson_id}, Status: {r.status}")
     
-    # Create a map of lesson_id -> lesson_column_id
     lesson_map = {l.id: l.lesson_column_id for l in lessons}
 
     result = [{
